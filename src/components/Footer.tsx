@@ -49,7 +49,7 @@ const Footer = () => {
             <ul className="space-y-2 md:space-y-3">
               {[
                 { label: "Inicio", path: "/" },
-                { label: "Decálogo", path: "/decálogo" },
+                { label: "Principios", path: "/decálogo" },
                 { label: "Quiénes Somos", path: "/quiénes-somos" },
                 { label: "Nuestros Mercados", path: "/nuestros-mercados" },
                 { label: "Qué Gestionamos", path: "/que-gestionamos" },

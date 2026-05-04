@@ -1,61 +1,164 @@
-import { Target, Eye, Award, Users } from "lucide-react";
+import { useState, useRef } from "react";
+import { Target, Eye, Award, Users, ChevronLeft, ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import Layout from "@/components/Layout";
+
+// 1. FUNCIÓN HIGHLIGHTER
+const highlightText = (text: string) => {
+  const parts = text.split(/(\d+\.\s.*?:)/g);
+  return parts.map((part, index) => {
+    if (/^\d+\.\s.*?:$/.test(part)) {
+      return <span key={index} className="font-bold text-primary">{part}</span>;
+    }
+    return part;
+  });
+};
+
+// Componente del Carrusel Corregido
+const StepCarousel = ({ items }: { items: { title: string, text: string }[] }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const scrollPosition = scrollContainerRef.current.scrollLeft;
+      const width = scrollContainerRef.current.offsetWidth;
+      const newIndex = Math.round(scrollPosition / width);
+      if (newIndex !== currentIndex) {
+        setCurrentIndex(newIndex);
+      }
+    }
+  };
+
+  const scrollToSlide = (index: number) => {
+    if (scrollContainerRef.current) {
+      const width = scrollContainerRef.current.offsetWidth;
+      scrollContainerRef.current.scrollTo({
+        left: index * width,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const nextSlide = () => scrollToSlide((currentIndex + 1) % items.length);
+  const prevSlide = () => scrollToSlide((currentIndex - 1 + items.length) % items.length);
+
+  return (
+    <div className="flex flex-col h-full w-full min-w-0">
+      
+      {/* Contenedor de Slide */}
+      <div 
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth w-full pb-4 [&::-webkit-scrollbar]:hidden"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
+        {items.map((item, i) => (
+          <div key={i} className="w-full shrink-0 snap-center pr-4">
+            <span className="font-bold text-primary block mb-2 text-lg">
+              {item.title}
+            </span>
+            <p className="text-muted-foreground text-lg leading-relaxed whitespace-normal break-words">
+              {item.text}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Controles: Se eliminó border-t y se ocultaron flechas en móvil */}
+      <div className="flex items-center justify-between mt-auto w-full">
+        {/* Flecha Izquierda: Solo visible en Desktop (md) */}
+        <button 
+          onClick={prevSlide} 
+          className="hidden md:flex p-2 text-slate-400 hover:text-primary transition-colors rounded-full hover:bg-slate-50"
+        >
+          <ChevronLeft size={20} />
+        </button>
+        
+        {/* Puntos Indicadores: Siempre visibles para feedback táctil */}
+        <div className="flex gap-1.5 mx-auto md:mx-0">
+          {items.map((_, i) => (
+            <button 
+              key={i} 
+              onClick={() => scrollToSlide(i)}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                i === currentIndex ? 'bg-primary w-5' : 'bg-slate-200 w-1.5'
+              }`} 
+              aria-label={`Ir al paso ${i + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Flecha Derecha: Solo visible en Desktop (md) */}
+        <button 
+          onClick={nextSlide} 
+          className="hidden md:flex p-2 text-slate-400 hover:text-primary transition-colors rounded-full hover:bg-slate-50"
+        >
+          <ChevronRight size={20} />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const QuienesSomos = () => {
   const values = [
     {
       icon: Target,
       title: "Nuestra Misión",
-      description:
-        "Proporcionar soluciones integrales en gestión de cadena de abastecimiento, ambiental, seguridad y responsabilidad social, ayudando a las empresas a alcanzar sus objetivos de sostenibilidad y excelencia operacional.",
+      description: "Impulsamos la transformación sostenible de organizaciones de múltiples industrias, generando valor tangible mediante soluciones integrales en cadena de abastecimiento y gestión ambiental, laboral y legal, apalancadas en analítica avanzada, inteligencia artificial e innovación."
     },
     {
       icon: Eye,
       title: "Nuestra Visión",
-      description:
-        "Ser la empresa líder reconocida a nivel nacional e internacional por nuestra innovación, compromiso con la sostenibilidad y la transformación positiva de las organizaciones.",
+      description: "Ser la firma líder en Colombia y América Latina en transformación sostenible y gestión integral del negocio, reconocida por integrar inteligencia artificial, analítica y mejores prácticas de clase mundial."
     },
     {
       icon: Award,
-      title: "Nuestros Valores",
-      description:
-        "Integridad, excelencia, innovación, responsabilidad ambiental y social, trabajo en equipo, y compromiso con la mejora continua en todos nuestros servicios.",
+      title: "Cómo generamos valor",
+      description: "• Entendemos su negocio y sus retos\n• Analizamos datos con IA para identificar oportunidades\n• Diseñamos soluciones a la medida\n• Implementamos con foco en resultados\n• Aseguramos mejora continua"
     },
     {
       icon: Users,
-      title: "Nuestro Equipo",
-      description:
-        "Profesionales altamente capacitados con amplia experiencia en sus áreas de especialización, comprometidos con brindar soluciones personalizadas y efectivas.",
+      title: "Cómo lo hacemos",
+      carouselItems: [
+        { 
+          title: "1. Entendimiento estratégico:", 
+          text: "Analizamos a profundidad el negocio, su contexto y sus desafíos para identificar oportunidades reales de mejora y generación de valor." 
+        },
+        { 
+          title: "2. Diagnóstico basado en datos:", 
+          text: "Utilizamos analítica avanzada e inteligencia artificial para evaluar procesos, identificar riesgos y descubrir oportunidades de optimización." 
+        },
+        { 
+          title: "3. Diseño de soluciones a la medida:", 
+          text: "Estructuramos soluciones integrales alineadas con la estrategia del cliente, incorporando mejores prácticas de clase mundial." 
+        },
+        { 
+          title: "4. Implementación con impacto:", 
+          text: "Acompañamos la ejecución asegurando adopción, eficiencia operativa y resultados medibles." 
+        },
+        { 
+          title: "5. Seguimiento y mejora continua:", 
+          text: "Monitoreamos indicadores, ajustamos estrategias y garantizamos sostenibilidad en el tiempo." 
+        }
+      ]
     },
-  ];
-
-  const stats = [
-    { number: "15+", label: "Años de Experiencia" },
-    { number: "500+", label: "Proyectos Completados" },
-    { number: "200+", label: "Clientes Satisfechos" },
-    { number: "50+", label: "Profesionales Expertos" },
   ];
 
   return (
     <Layout>
-      {/* Hero Section */}
       <section className="pt-28 md:pt-32 lg:pt-36 pb-20 gradient-primary text-white">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="max-w-4xl mx-auto text-center animate-fade-in">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-              ¿Quiénes Somos?
-            </h1>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">¿Transformamos su negocio?</h1>
             <p className="text-lg md:text-xl text-white/90 leading-relaxed">
-              Somos una empresa especializada en proporcionar soluciones innovadoras 
-              y sostenibles en gestión de cadena de abastecimiento, ambiental, seguridad, 
-              salud ocupacional y responsabilidad social empresarial.
+              Transformamos organizaciones mediante soluciones integrales en cadena de abastecimiento y gestión ambiental, laboral, legal y social...
             </p>
           </div>
         </div>
       </section>
 
-      {/* Values Section */}
       <section className="py-20 bg-gradient-subtle">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
@@ -64,81 +167,31 @@ const QuienesSomos = () => {
               return (
                 <Card
                   key={index}
-                  className="p-8 hover:shadow-primary transition-all duration-300 hover:-translate-y-2 group animate-fade-up"
+                  // AÑADIDO: overflow-hidden y min-w-0 para contener el layout estrictamente
+                  className="p-6 md:p-8 hover:shadow-primary transition-all duration-300 hover:-translate-y-2 group animate-fade-up flex flex-col h-full min-w-0 overflow-hidden"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className="w-16 h-16 rounded-xl gradient-primary flex items-center justify-center mb-6 group-hover:animate-float">
+                  <div className="w-16 h-16 rounded-xl gradient-primary flex items-center justify-center mb-6 group-hover:animate-float shrink-0">
                     <Icon className="text-primary-foreground" size={32} />
                   </div>
-                  <h3 className="text-2xl font-semibold mb-4 group-hover:text-primary transition-colors">
+
+                  <h3 className="text-2xl font-semibold mb-4 group-hover:text-primary transition-colors shrink-0">
                     {value.title}
                   </h3>
-                  <p className="text-muted-foreground leading-relaxed text-lg">
-                    {value.description}
-                  </p>
+
+                  {/* AÑADIDO: min-w-0 obliga a que los hijos Flexbox respeten el ancho y envuelvan el texto */}
+                  <div className="flex-grow flex flex-col w-full min-w-0">
+                    { 'carouselItems' in value ? (
+                      <StepCarousel items={value.carouselItems} />
+                    ) : (
+                      <p className="text-muted-foreground leading-relaxed text-lg whitespace-pre-line tracking-tight">
+                        { 'description' in value && highlightText(value.description as string)}
+                      </p>
+                    )}
+                  </div>
                 </Card>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-20 bg-secondary text-secondary-foreground">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Nuestra Trayectoria en Números
-            </h2>
-            <p className="text-secondary-foreground/80 text-lg">
-              Resultados que respaldan nuestra experiencia y compromiso
-            </p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
-            {stats.map((stat, index) => (
-              <div
-                key={index}
-                className="text-center animate-scale-in"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div className="text-4xl md:text-5xl font-bold mb-2 text-accent">
-                  {stat.number}
-                </div>
-                <div className="text-sm md:text-base text-secondary-foreground/80">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* About Section */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="max-w-4xl mx-auto animate-fade-in">
-            <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center">
-              Nuestra <span className="text-gradient">Historia</span>
-            </h2>
-            <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
-              <p>
-                Fundada con el propósito de revolucionar la gestión empresarial sostenible, 
-                hemos crecido hasta convertirnos en un referente en el sector. Nuestra pasión 
-                por la innovación y el compromiso con el medio ambiente nos impulsa a ofrecer 
-                soluciones que generan valor real para nuestros clientes.
-              </p>
-              <p>
-                A lo largo de los años, hemos desarrollado metodologías propias y alianzas 
-                estratégicas que nos permiten abordar los desafíos más complejos con 
-                creatividad y eficacia. Nuestro equipo multidisciplinario combina experiencia 
-                técnica con una profunda comprensión de las necesidades del negocio.
-              </p>
-              <p>
-                Hoy, continuamos expandiendo nuestro alcance y perfeccionando nuestros 
-                servicios para ayudar a más organizaciones a alcanzar sus objetivos de 
-                sostenibilidad y excelencia operacional.
-              </p>
-            </div>
           </div>
         </div>
       </section>

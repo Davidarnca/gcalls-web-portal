@@ -9,45 +9,45 @@ const Decalogo = () => {
   
   const principles = [
     {
-      title: "Compromiso con la Sostenibilidad",
-      description: "Integramos prácticas sostenibles en cada aspecto de nuestra gestión empresarial.",
+      title: "Resultados medibles",
+      description: "Usamos datos e inteligencia artificial para generar impacto tangible.",
     },
     {
-      title: "Transparencia Operacional",
-      description: "Mantenemos comunicación clara y honesta con todos nuestros stakeholders.",
+      title: "Decisiones basadas en datos",
+      description: "Transformamos información en ventajas competitivas.",
     },
     {
-      title: "Mejora Continua",
-      description: "Buscamos constantemente innovar y optimizar nuestros procesos y servicios.",
+      title: "Innovación aplicada",
+      description: "Incorporamos IA y tecnologías emergentes en soluciones prácticas.",
     },
     {
-      title: "Respeto al Medio Ambiente",
-      description: "Priorizamos la protección ambiental en todas nuestras operaciones.",
+      title: "Cercanía estratégica",
+      description: "Trabajamos como aliados del negocio.",
     },
     {
-      title: "Seguridad Integral",
-      description: "Garantizamos ambientes laborales seguros y saludables para todos.",
+      title: "Excelencia operativa",
+      description: "Rigor técnico en cada entrega.",
     },
     {
-      title: "Ética Profesional",
-      description: "Actuamos con integridad, honestidad y responsabilidad en cada decisión.",
+      title: "Sostenibilidad integral ",
+      description: "Impacto ambiental, social y económico.",
     },
     {
-      title: "Desarrollo del Talento",
-      description: "Invertimos en la capacitación y crecimiento profesional de nuestro equipo.",
+      title: "Ética y transparencia",
+      description: "Uso responsable de datos y tecnología.",
     },
     {
-      title: "Responsabilidad Social",
-      description: "Contribuimos activamente al bienestar de las comunidades donde operamos.",
+      title: "Talento aumentado",
+      description: "Combinamos experiencia humana con capacidades de IA.",
     },
     {
-      title: "Innovación Constante",
-      description: "Adoptamos nuevas tecnologías y metodologías para mejorar nuestros servicios.",
+      title: "Mejora continua",
+      description: "Evolucionamos con aprendizaje constante.",
     },
-    {
-      title: "Colaboración Estratégica",
-      description: "Fomentamos alianzas que generen valor compartido y beneficios mutuos.",
-    },
+    // {
+    //   title: "Trabajo colaborativo",
+    //   description: "Integramos capacidades para entregar soluciones más completas y efectivas.",
+    // },
   ];
 
   const displayedPrinciples = showAll ? principles : principles.slice(0, 4);
@@ -59,11 +59,10 @@ const Decalogo = () => {
           {/* Header */}
           <div className="text-center mb-20 animate-fade-in">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight">
-              Nuestro <span className="text-gradient">Decálogo</span>
+              Así trabajamos con nuestros <span className="text-gradient">clientes</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-[1.6]">
-              Diez principios fundamentales que guían nuestro compromiso con la excelencia, 
-              la sostenibilidad y la responsabilidad corporativa.
+              {/* Así trabajamos con nuestros clientes. */}
             </p>
           </div>
 
@@ -113,11 +112,10 @@ const Decalogo = () => {
             <div className="mt-20 text-center animate-fade-up">
               <div className="inline-block p-10 rounded-2xl gradient-primary max-w-3xl">
                 <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 tracking-tight">
-                  Principios que Transforman
+                  Propuesta de Valor
                 </h3>
                 <p className="text-white/95 text-lg leading-[1.7]">
-                  Cada uno de estos principios se refleja en nuestro trabajo diario 
-                  y en el compromiso con nuestros clientes y el medio ambiente.
+                  Integramos experiencia consultiva con inteligencia artificial y analítica avanzada para diseñar e implementar soluciones que optimizan la cadena de abastecimiento, fortalecen la gestión integral del negocio y generan resultados medibles en eficiencia, cumplimiento y sostenibilidad.
                 </p>
               </div>
             </div>

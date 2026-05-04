@@ -26,7 +26,7 @@ const Navbar = () => {
 
   const navLinks = [
     { name: "Inicio", path: "/" },
-    { name: "Decálogo", path: "/decalogo" },
+    { name: "Principios", path: "/decalogo" },
     { 
       name: "Nosotros", 
       path: "/quienes-somos",
