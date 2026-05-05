@@ -106,12 +106,12 @@ const QuienesSomos = () => {
     {
       icon: Target,
       title: "Nuestra Misión",
-      description: "Impulsamos la transformación sostenible de organizaciones de múltiples industrias, generando valor tangible mediante soluciones integrales en cadena de abastecimiento y gestión ambiental, laboral y legal, apalancadas en analítica avanzada, inteligencia artificial e innovación."
+      description: "Impulsamos la transformación sostenible de organizaciones de múltiples industrias, generando valor tangible mediante soluciones integrales en cadena de abastecimiento y gestión ambiental, laboral y legal, apalancadas en analítica avanzada, inteligencia artificial e innovación, para optimizar el desempeño, fortalecer la competitividad y asegurar un crecimiento responsable."
     },
     {
       icon: Eye,
       title: "Nuestra Visión",
-      description: "Ser la firma líder en Colombia y América Latina en transformación sostenible y gestión integral del negocio, reconocida por integrar inteligencia artificial, analítica y mejores prácticas de clase mundial."
+      description: "Ser la firma líder en Colombia y América Latina en transformación sostenible y gestión integral del negocio, reconocida por integrar inteligencia artificial, analítica y mejores prácticas de clase mundial, para generar impacto medible y relaciones de largo plazo."
     },
     {
       icon: Award,
@@ -153,7 +153,7 @@ const QuienesSomos = () => {
           <div className="max-w-4xl mx-auto text-center animate-fade-in">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">¿Transformamos su negocio?</h1>
             <p className="text-lg md:text-xl text-white/90 leading-relaxed">
-              Transformamos organizaciones mediante soluciones integrales en cadena de abastecimiento y gestión ambiental, laboral, legal y social...
+              Combinamos experiencia sectorial, analítica avanzada e inteligencia artificial para diseñar e implementar soluciones a la medida que optimizan el desempeño, fortalecen la competitividad y generan resultados tangibles y sostenibles.
             </p>
           </div>
         </div>

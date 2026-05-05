@@ -1,45 +1,49 @@
-import { Factory, Building2, Truck, Waves, Zap, ShoppingBag } from "lucide-react";
+import { Factory, Building2, Truck, Waves, Zap, ShoppingBag, Droplets, Pickaxe, Leaf, Plane, } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import Layout from "@/components/Layout";
 
 const NuestrosMercados = () => {
   const markets = [
     {
-      icon: Factory,
-      title: "Industria Manufacturera",
-      description:
-        "Optimización de procesos productivos, gestión de residuos industriales, seguridad operacional y certificaciones ambientales para plantas de manufactura.",
-    },
-    {
-      icon: Building2,
-      title: "Construcción e Infraestructura",
-      description:
-        "Gestión de proyectos sostenibles, manejo de materiales, seguridad en obra, evaluación de impacto ambiental y cumplimiento normativo.",
-    },
-    {
-      icon: Truck,
-      title: "Logística y Transporte",
-      description:
-        "Optimización de cadenas de suministro, reducción de huella de carbono en transporte, gestión de flotas y trazabilidad de productos.",
-    },
-    {
-      icon: Waves,
-      title: "Sector Energético",
-      description:
-        "Transición energética, gestión de residuos energéticos, evaluaciones de impacto ambiental y programas de eficiencia energética.",
-    },
-    {
-      icon: Zap,
-      title: "Minería y Recursos Naturales",
-      description:
-        "Gestión ambiental minera, planes de cierre de minas, rehabilitación de áreas intervenidas y relaciones con comunidades.",
-    },
-    {
-      icon: ShoppingBag,
-      title: "Retail y Distribución",
-      description:
-        "Gestión sostenible de inventarios, economía circular, reducción de desperdicios y programas de responsabilidad social corporativa.",
-    },
+    icon: Droplets,
+    title: "Oil & Gas",
+    description: "Optimización de operaciones, abastecimiento y cumplimiento regulatorio."
+  },
+  {
+    icon: Zap,
+    title: "Energía",
+    description: "Eficiencia operativa, sostenibilidad y gestión de activos."
+  },
+  {
+    icon: Pickaxe,
+    title: "Minería",
+    description: "Optimización de la cadena de suministro y gestión ambiental."
+  },
+  {
+    icon: Leaf,
+    title: "Medio Ambiente y Sostenibilidad",
+    description: "Estrategias ESG, cumplimiento y gestión de impacto."
+  },
+  {
+    icon: Waves,
+    title: "Agua y Saneamiento",
+    description: "Eficiencia operativa y gestión sostenible de recursos."
+  },
+  {
+    icon: Truck,
+    title: "Transporte y Logística",
+    description: "Optimización de redes, costos y niveles de servicio."
+  },
+  {
+    icon: Building2,
+    title: "Infraestructura",
+    description: "Gestión integral de proyectos y riesgos."
+  },
+  {
+    icon: Plane,
+    title: "Aeropuertos",
+    description: "Eficiencia operativa, cumplimiento y experiencia del usuario."
+  }
   ];
 
   return (
@@ -49,11 +53,10 @@ const NuestrosMercados = () => {
         <div className="container mx-auto px-4 lg:px-8">
           <div className="max-w-4xl mx-auto text-center animate-fade-in">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-              Nuestros Mercados
+              Industrias que Atendemos
             </h1>
             <p className="text-lg md:text-xl text-white/90 leading-relaxed">
-              Atendemos diversos sectores industriales con soluciones personalizadas 
-              que impulsan la sostenibilidad y la eficiencia operacional.
+              Trabajamos con organizaciones de sectores estratégicos, aportando soluciones especializadas que combinan experiencia, analítica e inteligencia artificial para optimizar su desempeño. Nuestra misión es impulsar la sostenibilidad y la responsabilidad corporativa en cada industria que servimos.
             </p>
           </div>
         </div>
@@ -62,7 +65,7 @@ const NuestrosMercados = () => {
       {/* Markets Grid */}
       <section className="py-20 bg-gradient-subtle">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {markets.map((market, index) => {
               const Icon = market.icon;
               return (
