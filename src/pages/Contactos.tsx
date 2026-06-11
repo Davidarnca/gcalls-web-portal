@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +9,7 @@ import Layout from "@/components/Layout";
 
 const Contactos = () => {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -17,23 +18,51 @@ const Contactos = () => {
     message: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Simulación de envío
-    toast({
-      title: "¡Mensaje Enviado!",
-      description: "Nos pondremos en contacto con usted pronto.",
-    });
+    setIsSubmitting(true);
 
-    // Limpiar formulario
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      company: "",
-      message: "",
-    });
+    try {
+      const response = await fetch("http://127.0.0.1:3000/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre: formData.name,
+          email: formData.email,
+          mensaje: `Empresa: ${formData.company}\nTeléfono: ${formData.phone}\n\nMensaje:\n${formData.message}`,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "¡Mensaje Enviado!",
+          description: "Nos pondremos en contacto con usted pronto.",
+        });
+
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          company: "",
+          message: "",
+        });
+      } else {
+        throw new Error(data.error || "Error al enviar el mensaje");
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        title: "Error de envío",
+        description: "No se pudo conectar con el servidor. Inténtelo más tarde.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (
@@ -136,10 +165,7 @@ const Contactos = () => {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label
-                        htmlFor="name"
-                        className="block text-sm font-medium mb-2"
-                      >
+                      <label htmlFor="name" className="block text-sm font-medium mb-2">
                         Nombre Completo *
                       </label>
                       <Input
@@ -154,10 +180,7 @@ const Contactos = () => {
                       />
                     </div>
                     <div>
-                      <label
-                        htmlFor="email"
-                        className="block text-sm font-medium mb-2"
-                      >
+                      <label htmlFor="email" className="block text-sm font-medium mb-2">
                         Correo Electrónico *
                       </label>
                       <Input
@@ -175,10 +198,7 @@ const Contactos = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label
-                        htmlFor="phone"
-                        className="block text-sm font-medium mb-2"
-                      >
+                      <label htmlFor="phone" className="block text-sm font-medium mb-2">
                         Teléfono
                       </label>
                       <Input
@@ -192,10 +212,7 @@ const Contactos = () => {
                       />
                     </div>
                     <div>
-                      <label
-                        htmlFor="company"
-                        className="block text-sm font-medium mb-2"
-                      >
+                      <label htmlFor="company" className="block text-sm font-medium mb-2">
                         Empresa
                       </label>
                       <Input
@@ -211,10 +228,7 @@ const Contactos = () => {
                   </div>
 
                   <div>
-                    <label
-                      htmlFor="message"
-                      className="block text-sm font-medium mb-2"
-                    >
+                    <label htmlFor="message" className="block text-sm font-medium mb-2">
                       Mensaje *
                     </label>
                     <Textarea
@@ -232,10 +246,11 @@ const Contactos = () => {
                   <Button
                     type="submit"
                     size="lg"
-                    className="w-full gradient-primary hover:shadow-glow transition-all duration-300 hover:scale-105"
+                    disabled={isSubmitting}
+                    className="w-full gradient-primary hover:shadow-glow transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
                   >
-                    Enviar Mensaje
-                    <Send className="ml-2" size={20} />
+                    {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send size={20} />}
+                    {isSubmitting ? "Enviando mensaje..." : "Enviar Mensaje"}
                   </Button>
                 </form>
               </Card>
