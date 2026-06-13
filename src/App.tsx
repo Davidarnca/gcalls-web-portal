@@ -4,8 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import Layout from "./components/Layout"; // 1. Importamos tu Layout original
+
 import Index from "./pages/Index";
 import Decalogo from "./pages/Decalogo";
 import QuienesSomos from "./pages/QuienesSomos";
@@ -29,24 +29,24 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <ScrollToTop />
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/decalogo" element={<Decalogo />} />
-          <Route path="/quienes-somos" element={<QuienesSomos />} />
-          <Route path="/nuestro-equipo" element={<NuestroEquipo />} />
-          <Route path="/nuestros-mercados" element={<NuestrosMercados />} />
-          <Route path="/que-gestionamos" element={<QueGestionamos />} />
-          <Route path="/servicios/supply-chain-management" element={<SupplyChain />} />
-          <Route path="/servicios/gestion-ambiental-seguridad-salud" element={<GestionAmbiental />} />
-          <Route path="/servicios/gestion-talento-humano" element={<TalentoHumano />} />
-          <Route path="/servicios/gestion-social-rse" element={<GestionSocial />} />
-          <Route path="/servicios/asesoria-legal" element={<AsesoriaLegal />} />
-          <Route path="/contactos" element={<Contactos />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Footer />
+        {/* 2. Envolvemos todo con tu Layout. Así recuperas el Navbar, Footer y WhatsApp de un solo golpe */}
+        <Layout> 
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/decalogo" element={<Decalogo />} />
+            <Route path="/quienes-somos" element={<QuienesSomos />} />
+            <Route path="/nuestro-equipo" element={<NuestroEquipo />} />
+            <Route path="/nuestros-mercados" element={<NuestrosMercados />} />
+            <Route path="/que-gestionamos" element={<QueGestionamos />} />
+            <Route path="/servicios/supply-chain-management" element={<SupplyChain />} />
+            <Route path="/servicios/gestion-ambiental-seguridad-salud" element={<GestionAmbiental />} />
+            <Route path="/servicios/gestion-talento-humano" element={<TalentoHumano />} />
+            <Route path="/servicios/gestion-social-rse" element={<GestionSocial />} />
+            <Route path="/servicios/asesoria-legal" element={<AsesoriaLegal />} />
+            <Route path="/contactos" element={<Contactos />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Layout>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
