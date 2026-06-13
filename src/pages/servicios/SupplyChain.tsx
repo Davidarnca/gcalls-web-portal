@@ -8,7 +8,6 @@ import {
   ArrowLeft,
   Container // Icono más representativo de Supply Chain
 } from "lucide-react";
-import Layout from "@/components/Layout";
 import { Card } from "@/components/ui/card";
 
 const highlightBullets = (text: string) => {
@@ -49,8 +48,7 @@ const SupplyChain = () => {
   ];
 
   return (
-    <Layout>
-      {/* SECCIÓN HERO CON DEGRADADO BASADO EN LA PALETA G-CALLS */}
+    <>      {/* SECCIÓN HERO CON DEGRADADO BASADO EN LA PALETA G-CALLS */}
       <section className="relative pt-32 pb-24 lg:pt-40 lg:pb-32 min-h-screen flex items-center overflow-hidden">
         
         {/* Fondo con degradado cromático: Verde -> Azul -> Naranja sutil */}
@@ -125,8 +123,7 @@ const SupplyChain = () => {
           </div>
         </div>
       </section>
-    </Layout>
-  );
+    </>  );
 };
 
 export default SupplyChain;

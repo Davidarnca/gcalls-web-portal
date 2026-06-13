@@ -11,7 +11,6 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
-import Layout from "@/components/Layout";
 import heroImage from "@/assets/hero-city.png";
 import { useRef, useState, useEffect, useCallback } from "react";
 
@@ -96,8 +95,7 @@ const Index = () => {
   }, [testimonialsApi, onTestimonialsSelect]);
 
   return (
-    <Layout>
-      {/* Hero Section */}
+    <>      {/* Hero Section */}
       <section className="relative w-full h-screen flex items-center justify-center overflow-hidden gradient-primary">
         <div className="absolute inset-0 opacity-10" style={{ transform: `translateY(${scrollY * 0.3}px)` }}>
           <div className="absolute inset-0 animate-gradient-shift" 
@@ -398,8 +396,7 @@ const Index = () => {
           </Link>
         </div>
       </section>
-    </Layout>
-  );
+    </>  );
 };
 
 export default Index;

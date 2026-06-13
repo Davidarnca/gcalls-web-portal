@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import Layout from "@/components/Layout";
 
 const Contactos = () => {
   const { toast } = useToast();
@@ -96,8 +95,7 @@ const Contactos = () => {
   ];
 
   return (
-    <Layout>
-      {/* Hero Section */}
+    <>      {/* Hero Section */}
       <section className="pt-28 md:pt-32 lg:pt-36 pb-20 gradient-primary text-white">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="max-w-4xl mx-auto text-center animate-fade-in">
@@ -258,8 +256,7 @@ const Contactos = () => {
           </div>
         </div>
       </section>
-    </Layout>
-  );
+    </>  );
 };
 
 export default Contactos;

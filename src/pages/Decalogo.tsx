@@ -1,7 +1,6 @@
 import { CheckCircle2, ChevronDown } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import Layout from "@/components/Layout";
 import { useState } from "react";
 
 const Decalogo = () => {
@@ -53,8 +52,7 @@ const Decalogo = () => {
   const displayedPrinciples = showAll ? principles : principles.slice(0, 4);
 
   return (
-    <Layout>
-      <section className="pt-28 md:pt-32 lg:pt-36 pb-20 bg-gradient-subtle">
+    <>      <section className="pt-28 md:pt-32 lg:pt-36 pb-20 bg-gradient-subtle">
         <div className="container mx-auto px-4 lg:px-8">
           {/* Header */}
           <div className="text-center mb-20 animate-fade-in">
@@ -122,8 +120,7 @@ const Decalogo = () => {
           )}
         </div>
       </section>
-    </Layout>
-  );
+    </>  );
 };
 
 export default Decalogo;

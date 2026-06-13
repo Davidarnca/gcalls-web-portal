@@ -1,6 +1,5 @@
 import { Users, Linkedin, Mail, Award, Target, Heart } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import Layout from "@/components/Layout";
 import teamMember1 from "@/assets/team-member-1.jpg";
 import teamMember2 from "@/assets/team-member-2.jpg";
 import teamMember3 from "@/assets/team-member-3.jpg";
@@ -61,8 +60,7 @@ const NuestroEquipo = () => {
   ];
 
   return (
-    <Layout>
-      <div className="min-h-screen">
+    <>      <div className="min-h-screen">
         {/* Hero Section */}
         <section className="relative pt-28 md:pt-32 lg:pt-36 pb-12 md:pb-16 lg:pb-20 bg-gradient-to-br from-primary/5 via-accent/5 to-background overflow-hidden">
           <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]"></div>
@@ -206,8 +204,7 @@ const NuestroEquipo = () => {
         </div>
       </section>
       </div>
-    </Layout>
-  );
+    </>  );
 };
 
 export default NuestroEquipo;

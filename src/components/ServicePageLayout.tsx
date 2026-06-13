@@ -2,7 +2,6 @@ import { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Layout from "@/components/Layout";
 import logoWhite from "@/assets/logo-white.svg";
 import heroBg from "@/assets/hero-city.png";
 
@@ -15,8 +14,7 @@ interface ServicePageLayoutProps {
 
 const ServicePageLayout = ({ title, description, icon, children }: ServicePageLayoutProps) => {
   return (
-    <Layout>
-      {/* Hero Section */}
+    <>      {/* Hero Section */}
       <section
         className="relative w-full min-h-[80vh] flex items-center justify-center overflow-hidden"
         style={{
@@ -72,8 +70,7 @@ const ServicePageLayout = ({ title, description, icon, children }: ServicePageLa
       </section>
 
       {children}
-    </Layout>
-  );
+    </>  );
 };
 
 export default ServicePageLayout;

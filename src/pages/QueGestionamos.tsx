@@ -1,6 +1,5 @@
 import { TrendingUp, Leaf, Shield, Heart, Users, FileCheck } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import Layout from "@/components/Layout";
 
 const QueGestionamos = () => {
   const services = [
@@ -79,8 +78,7 @@ const QueGestionamos = () => {
   ];
 
   return (
-    <Layout>
-      {/* Hero Section */}
+    <>      {/* Hero Section */}
       <section className="pt-28 md:pt-32 lg:pt-36 pb-20 gradient-accent text-white">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="max-w-4xl mx-auto text-center animate-fade-in">
@@ -177,8 +175,7 @@ const QueGestionamos = () => {
           </div>
         </div>
       </section>
-    </Layout>
-  );
+    </>  );
 };
 
 export default QueGestionamos;
