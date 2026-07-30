@@ -13,7 +13,7 @@ export default function MaintenancePage() {
           <img
             src={logoSvg} // O reemplaza por la ruta de tu logo, ej: /logo.png o /assets/...
             alt="G-Calls S.A.S."
-            className="h-28 md:h-32 w-auto object-contain transition-transform hover:scale-105"
+            className="h-36 sm:h-44 md:h-52 w-auto object-contain transition-transform hover:scale-105"
           />
         </div>
 
