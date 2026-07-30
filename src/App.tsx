@@ -52,15 +52,12 @@ const IS_MAINTENANCE_MODE = true;
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Vite detecta automáticamente si estás en local (development) o en producción (production)
-  const isLocalDev = import.meta.env.DEV;
-
-  // Si está activo el mantenimiento Y NO estás en desarrollo local, muestra la imagen.
-  if (IS_MAINTENANCE_MODE && !isLocalDev) {
+  // Al dejar solo IS_MAINTENANCE_MODE en true, forzamos la vista
+  // tanto en local como en producción de forma 100% infalible.
+  if (IS_MAINTENANCE_MODE) {
     return <Mantenimiento />;
   }
 
-  // De lo contrario (en local o cuando desactives el mantenimiento), renderiza la web completa
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
