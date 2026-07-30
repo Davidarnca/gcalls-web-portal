@@ -20,32 +20,8 @@ import TalentoHumano from "./pages/servicios/TalentoHumano";
 import GestionSocial from "./pages/servicios/GestionSocial";
 import AsesoriaLegal from "./pages/servicios/AsesoriaLegal";
 
-// Componente de mantenimiento
-const Mantenimiento = () => (
-  <div style={{
-    width: '100vw',
-    minHeight: '100vh',
-    backgroundColor: '#0a111e', // Mismo color de fondo de la tarjeta
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: '16px',
-    boxSizing: 'border-box',
-    overflow: 'hidden'
-  }}>
-    <img 
-      src="/mantenimiento-gcalls.png" 
-      alt="G-Calls S.A.S. - Sitio en Mantenimiento" 
-      style={{
-        width: '100%',
-        maxWidth: '1200px', // Limita el ancho máximo para pantallas gigantes
-        height: 'auto',     // Mantiene proporción
-        maxHeight: '95vh',
-        objectFit: 'contain'
-      }}
-    />
-  </div>
-);
+// Importa el nuevo componente JSX responsivo creado desde Figma Make
+import Mantenimiento from "./components/Mantenimiento";
 
 // Switch principal de mantenimiento
 const IS_MAINTENANCE_MODE = true; 
@@ -53,15 +29,14 @@ const IS_MAINTENANCE_MODE = true;
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Vite activa esta variable solo cuando ejecutas 'npm run dev' en tu PC
+  // Vite detecta si ejecutas 'npm run dev' en local
   const isLocalDev = import.meta.env.DEV;
 
-  // Si está activo el mantenimiento Y NO estás en desarrollo local, muestra la imagen.
+  // Renderiza la nueva pantalla JSX si está en mantenimiento y en servidor en vivo
   if (IS_MAINTENANCE_MODE && !isLocalDev) {
     return <Mantenimiento />;
   }
 
-  // En local (o cuando cambies IS_MAINTENANCE_MODE a false) renderizará el sitio web completo
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
