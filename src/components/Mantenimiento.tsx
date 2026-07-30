@@ -7,13 +7,13 @@ export default function MaintenancePage() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full bg-emerald-500/5 blur-3xl pointer-events-none" />
 
       {/* Central card */}
-      <div className="w-full max-w-[800px] flex flex-col items-center gap-6 bg-[#151F32]/80 border border-white/5 backdrop-blur-sm rounded-2xl px-12 py-14 relative z-10">
-        {/* Logo G-Calls */}
-        <div className="flex items-center justify-center">
+      <div className="w-full max-w-[800px] flex flex-col items-center gap-5 bg-[#151F32]/80 border border-white/5 backdrop-blur-sm rounded-2xl px-6 md:px-12 py-10 md:py-12 relative z-10">
+        {/* Logo G-Calls con tamaño idéntico al original */}
+        <div className="flex items-center justify-center w-full -mt-2 mb-1">
           <img
-            src={logoSvg} // O reemplaza por la ruta de tu logo, ej: /logo.png o /assets/...
+            src={logoSvg}
             alt="G-Calls S.A.S."
-            className="h-36 sm:h-44 md:h-52 w-auto object-contain transition-transform hover:scale-105"
+            className="w-28 sm:w-32 md:w-36 h-auto object-contain transition-transform duration-300 hover:scale-105"
           />
         </div>
 
@@ -27,6 +27,9 @@ export default function MaintenancePage() {
             En Proceso
           </span>
         </div>
+
+        {/* Título */}
+        {/* ... resto de tu código sin cambios ... */}
 
         {/* Title */}
         <h1 className="text-4xl md:text-5xl font-bold text-center leading-tight">
