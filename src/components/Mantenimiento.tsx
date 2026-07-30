@@ -8,12 +8,12 @@ export default function MaintenancePage() {
 
       {/* Central card */}
       <div className="w-full max-w-[800px] flex flex-col items-center gap-5 bg-[#151F32]/80 border border-white/5 backdrop-blur-sm rounded-2xl px-6 md:px-12 py-10 md:py-12 relative z-10">
-        {/* Logo G-Calls con tamaño idéntico al original */}
-        <div className="flex items-center justify-center w-full -mt-2 mb-1">
+        {/* Logo G-Calls escalado directamente */}
+        <div className="flex items-center justify-center w-full py-4 overflow-visible">
           <img
             src={logoSvg}
             alt="G-Calls S.A.S."
-            className="w-28 sm:w-32 md:w-36 h-auto object-contain transition-transform duration-300 hover:scale-105"
+            className="h-28 w-auto object-contain scale-150 md:scale-[1.75] transform-gpu origin-center transition-transform hover:scale-[1.85]"
           />
         </div>
 
