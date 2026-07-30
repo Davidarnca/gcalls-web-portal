@@ -25,22 +25,23 @@ const Mantenimiento = () => (
   <div style={{
     width: '100vw',
     minHeight: '100vh',
-    backgroundColor: '#0a111e',
+    backgroundColor: '#0a111e', // Mismo color de fondo de la tarjeta
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: '20px',
-    margin: 0,
-    boxSizing: 'border-box'
+    padding: '16px',
+    boxSizing: 'border-box',
+    overflow: 'hidden'
   }}>
     <img 
       src="/mantenimiento-gcalls.png" 
       alt="G-Calls S.A.S. - Sitio en Mantenimiento" 
       style={{
-        maxWidth: '100%',
-        maxHeight: '90vh',
-        objectFit: 'contain',
-        borderRadius: '12px'
+        width: '100%',
+        maxWidth: '1200px', // Limita el ancho máximo para pantallas gigantes
+        height: 'auto',     // Mantiene proporción
+        maxHeight: '95vh',
+        objectFit: 'contain'
       }}
     />
   </div>
