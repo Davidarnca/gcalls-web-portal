@@ -9,7 +9,7 @@ export default function MaintenancePage() {
         {/* Logo G-Calls */}
         <div className="flex items-center justify-center">
           <img
-            src="assets/logo.svg" // O reemplaza por la ruta de tu logo, ej: /logo.png o /assets/...
+            src="logo.svg" // O reemplaza por la ruta de tu logo, ej: /logo.png o /assets/...
             alt="G-Calls S.A.S."
             className="h-20 w-auto object-contain"
           />
