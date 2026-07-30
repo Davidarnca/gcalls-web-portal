@@ -1,3 +1,5 @@
+import logoSvg from "@/assets/logo.svg";
+
 export default function MaintenancePage() {
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#0B1120] px-5 py-20 relative overflow-hidden">
@@ -9,7 +11,7 @@ export default function MaintenancePage() {
         {/* Logo G-Calls */}
         <div className="flex items-center justify-center">
           <img
-            src="logo.svg" // O reemplaza por la ruta de tu logo, ej: /logo.png o /assets/...
+            src={logoSvg} // O reemplaza por la ruta de tu logo, ej: /logo.png o /assets/...
             alt="G-Calls S.A.S."
             className="h-20 w-auto object-contain"
           />
