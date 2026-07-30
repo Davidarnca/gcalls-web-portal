@@ -46,18 +46,21 @@ const Mantenimiento = () => (
   </div>
 );
 
-// Cambia a true para activar mantenimiento en producción
+// Switch principal de mantenimiento
 const IS_MAINTENANCE_MODE = true; 
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Al dejar solo IS_MAINTENANCE_MODE en true, forzamos la vista
-  // tanto en local como en producción de forma 100% infalible.
-  if (IS_MAINTENANCE_MODE) {
+  // Vite activa esta variable solo cuando ejecutas 'npm run dev' en tu PC
+  const isLocalDev = import.meta.env.DEV;
+
+  // Si está activo el mantenimiento Y NO estás en desarrollo local, muestra la imagen.
+  if (IS_MAINTENANCE_MODE && !isLocalDev) {
     return <Mantenimiento />;
   }
 
+  // En local (o cuando cambies IS_MAINTENANCE_MODE a false) renderizará el sitio web completo
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
