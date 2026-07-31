@@ -13,7 +13,7 @@ export default function MaintenancePage() {
           <img
             src={logoSvg}
             alt="G-Calls S.A.S."
-            className="h-44 w-auto object-contain scale-180 md:scale-[2.3] transform-gpu origin-center transition-transform hover:scale-[2.4]"
+            className="h-36 w-auto max-w-full object-contain scale-[1.25] sm:h-44 sm:scale-[1.4] md:h-56 md:scale-[1.8] lg:h-64 lg:scale-[2.2] transform-gpu origin-center transition-transform hover:scale-[2.4]"
           />
         </div>
 
