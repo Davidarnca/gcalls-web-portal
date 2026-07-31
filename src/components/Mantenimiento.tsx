@@ -1,4 +1,4 @@
-import logoSvg from "@/assets/logo.svg";
+import logoJpg from "@/assets/logo.jpg";
 
 export default function MaintenancePage() {
   return (
@@ -11,7 +11,7 @@ export default function MaintenancePage() {
         {/* Logo G-Calls escalado directamente */}
         <div className="flex items-center justify-center w-full py-4 overflow-visible">
           <img
-            src={logoSvg}
+            src={logoJpg}
             alt="G-Calls S.A.S."
             className="h-28 w-auto object-contain scale-150 md:scale-[1.75] transform-gpu origin-center transition-transform hover:scale-[1.85]"
           />
