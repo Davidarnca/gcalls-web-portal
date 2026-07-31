@@ -6,16 +6,17 @@ export default function MaintenancePage() {
       {/* Ambient glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full bg-emerald-500/5 blur-3xl pointer-events-none" />
 
-      {/* Central card */}
-      <div className="w-full max-w-[800px] flex flex-col items-center gap-5 bg-[#151F32]/80 border border-white/5 backdrop-blur-sm rounded-2xl px-6 md:px-12 py-10 md:py-12 relative z-10">
-        {/* Logo G-Calls escalado directamente */}
-        <div className="flex items-center justify-center w-full py-4 overflow-visible">
-          <img
-            src={logoSvg}
-            alt="G-Calls S.A.S."
-            className="h-36 w-auto object-contain scale-150 md:scale-[2] transform-gpu origin-center transition-transform hover:scale-[2.1]"
-          />
-        </div>
+    {/* Central card */}
+<div className="w-full max-w-[800px] flex flex-col items-center gap-5 bg-[#151F32]/80 border border-white/5 backdrop-blur-sm rounded-2xl px-6 md:px-12 py-10 md:py-12 relative z-10">
+  
+  {/* Logo G-Calls con escala equilibrada */}
+  <div className="flex items-center justify-center w-full py-2 overflow-visible">
+    <img
+      src={logoSvg}
+      alt="G-Calls S.A.S."
+      className="h-32 md:h-40 w-auto object-contain scale-125 md:scale-150 transform-gpu origin-center transition-transform hover:scale-160"
+    />
+  </div>
 
         {/* Status badge */}
         <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
