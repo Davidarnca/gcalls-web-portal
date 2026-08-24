@@ -1,4 +1,3 @@
-import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -20,19 +19,17 @@ import TalentoHumano from "./pages/servicios/TalentoHumano";
 import GestionSocial from "./pages/servicios/GestionSocial";
 import AsesoriaLegal from "./pages/servicios/AsesoriaLegal";
 
-// Importa el nuevo componente JSX responsivo creado desde Figma Make
 import Mantenimiento from "./components/Mantenimiento";
 
-// Switch principal de mantenimiento
-const IS_MAINTENANCE_MODE = true; 
+// Evaluación segura del flag de mantenimiento con fallback defensivo
+const rawMaintenanceEnv = import.meta.env.VITE_MAINTENANCE_MODE;
+const IS_MAINTENANCE_MODE = rawMaintenanceEnv ? rawMaintenanceEnv === "true" : false;
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Vite detecta si ejecutas 'npm run dev' en local
   const isLocalDev = import.meta.env.DEV;
 
-  // Renderiza la nueva pantalla JSX si está en mantenimiento y en servidor en vivo
   if (IS_MAINTENANCE_MODE && !isLocalDev) {
     return <Mantenimiento />;
   }
@@ -40,11 +37,10 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
-          <Layout> 
+          <Layout>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/decalogo" element={<Decalogo />} />
