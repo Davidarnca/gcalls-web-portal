@@ -22,14 +22,17 @@ import AsesoriaLegal from "./pages/servicios/AsesoriaLegal";
 import Mantenimiento from "./components/Mantenimiento";
 
 // Evaluación segura del flag de mantenimiento con fallback defensivo
+// Si rawMaintenanceEnv no está definido o es "true", se considera en mantenimiento.
+// Solo se desactiva si explícitamente es "false".
 const rawMaintenanceEnv = import.meta.env.VITE_MAINTENANCE_MODE;
-const IS_MAINTENANCE_MODE = rawMaintenanceEnv ? rawMaintenanceEnv === "true" : false;
+const IS_MAINTENANCE_MODE = rawMaintenanceEnv !== "false";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   const isLocalDev = import.meta.env.DEV;
 
+  // Si está en modo mantenimiento y NO es entorno de desarrollo local, muestra la pantalla de mantenimiento
   if (IS_MAINTENANCE_MODE && !isLocalDev) {
     return <Mantenimiento />;
   }
