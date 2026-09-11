@@ -64,7 +64,7 @@ export default function MaintenancePage() {
           <div className="w-full h-1.5 bg-slate-700/60 rounded-full overflow-hidden">
             <div
               className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400"
-              style={{ width: "70%" }}
+              style={{ width: "81%" }}
             />
           </div>
           <div className="flex items-center justify-between">
