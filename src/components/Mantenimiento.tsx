@@ -59,7 +59,7 @@ export default function MaintenancePage() {
             <span className="text-sm text-slate-500">
               Renovación de plataforma
             </span>
-            <span className="text-sm font-medium text-emerald-400">70%</span>
+            <span className="text-sm font-medium text-emerald-400">81%</span>
           </div>
           <div className="w-full h-1.5 bg-slate-700/60 rounded-full overflow-hidden">
             <div
