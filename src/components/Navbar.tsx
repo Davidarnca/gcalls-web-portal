@@ -42,12 +42,13 @@ const Navbar = () => {
       path: "/que-gestionamos",
       submenu: [
         { name: "Cadena de Abastecimiento Inteligente", path: "/servicios/supply-chain-management" },
-        { name: "Gestión Ambiental; Seguridad Industrial y Salud Ocupacional", path: "/servicios/gestion-ambiental-seguridad-salud" },
+        { name: "Gestión Ambiental y Sostenibilidad (ESG)", path: "/servicios/gestion-ambiental-sostenibilidad" },
+        { name: "Seguridad y Salud en el Trabajo (SST)", path: "/servicios/seguridad-salud-trabajo" },
         { name: "Gestión del Talento Humano y Relaciones Industriales", path: "/servicios/gestion-talento-humano" },
         { name: "Gestión Social y Responsabilidad Social Empresarial", path: "/servicios/gestion-social-rse" },
         { name: "Gestión y Asesoría Legal en las líneas de Servicio Ofrecidas", path: "/servicios/asesoria-legal" },
       ],
-      submenuWidth: "w-[22rem]"
+      submenuWidth: "w-[24rem]"
     },
   ];
 

@@ -14,10 +14,11 @@ import QueGestionamos from "./pages/QueGestionamos";
 import Contactos from "./pages/Contactos";
 import NotFound from "./pages/NotFound";
 import SupplyChain from "./pages/servicios/SupplyChain";
-import GestionAmbiental from "./pages/servicios/GestionAmbiental";
+import GestionAmbientalEsg from "./pages/servicios/GestionAmbientalEsg";
 import TalentoHumano from "./pages/servicios/TalentoHumano";
 import GestionSocial from "./pages/servicios/GestionSocial";
 import AsesoriaLegal from "./pages/servicios/AsesoriaLegal";
+import Sst from "./pages/servicios/Sst";
 
 import Mantenimiento from "./components/Mantenimiento";
 
@@ -52,7 +53,8 @@ const App = () => {
               <Route path="/nuestros-mercados" element={<NuestrosMercados />} />
               <Route path="/que-gestionamos" element={<QueGestionamos />} />
               <Route path="/servicios/supply-chain-management" element={<SupplyChain />} />
-              <Route path="/servicios/gestion-ambiental-seguridad-salud" element={<GestionAmbiental />} />
+              <Route path="/servicios/gestion-ambiental-sostenibilidad" element={<GestionAmbientalEsg />} />
+              <Route path="/servicios/seguridad-salud-trabajo" element={<Sst />} />
               <Route path="/servicios/gestion-talento-humano" element={<TalentoHumano />} />
               <Route path="/servicios/gestion-social-rse" element={<GestionSocial />} />
               <Route path="/servicios/asesoria-legal" element={<AsesoriaLegal />} />
