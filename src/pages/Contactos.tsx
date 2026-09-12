@@ -4,10 +4,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
+// Sonner es el sistema de notificaciones activo en el proyecto (ver App.tsx)
+import { toast } from "@/components/ui/sonner";
+
+// URL del endpoint PHP — el proxy de Vite redirige /api → servidor PHP en dev
+const API_URL = "/api/contactos.php";
+
+// Tipo del payload que acepta la API REST PHP
+export interface ContactoPayload {
+  nombre: string;
+  email: string;
+  empresa: string;
+  telefono: string;
+  mensaje: string;
+  servicio_interes?: number;
+}
+
+// Forma estandarizada de respuesta de la API REST PHP
+export interface ApiResponse {
+  success: boolean;
+  message: string;
+  data?: { id: number; estado: string; fecha_registro: string };
+  errors?: Record<string, string>;
+}
 
 const Contactos = () => {
-  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -17,48 +38,82 @@ const Contactos = () => {
     message: "",
   });
 
+  // Estado de validación por campo — muestra errores devueltos por la API
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  const EMPTY_FORM = { name: "", email: "", phone: "", company: "", message: "" };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setFieldErrors({});
+
+    // Construye el payload usando los nombres de campo del contrato PHP
+    const payload: ContactoPayload = {
+      nombre:   formData.name.trim(),
+      email:    formData.email.trim(),
+      empresa:  formData.company.trim(),
+      telefono: formData.phone.trim(),
+      mensaje:  formData.message.trim(),
+    };
 
     try {
-      const response = await fetch("http://127.0.0.1:3000/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nombre: formData.name,
-          email: formData.email,
-          mensaje: `Empresa: ${formData.company}\nTeléfono: ${formData.phone}\n\nMensaje:\n${formData.message}`,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        toast({
-          title: "¡Mensaje Enviado!",
-          description: "Nos pondremos en contacto con usted pronto.",
-        });
-
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          company: "",
-          message: "",
-        });
+      let response;
+      
+      if (import.meta.env.DEV) {
+        // En desarrollo, usamos la capa de Mock
+        const { mockFetchContacto } = await import("@/lib/api/contactos.mock");
+        response = await mockFetchContacto(payload);
       } else {
-        throw new Error(data.error || "Error al enviar el mensaje");
+        // En producción, petición real al backend PHP
+        response = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
       }
-    } catch (error) {
-      console.error(error);
-      toast({
-        variant: "destructive",
-        title: "Error de envío",
-        description: "No se pudo conectar con el servidor. Inténtelo más tarde.",
+
+      // Intentamos parsear siempre — la API siempre devuelve JSON
+      let data: ApiResponse;
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error("La respuesta del servidor no es JSON válido.");
+      }
+
+      if (response.ok && data.success) {
+        // ── Éxito ───────────────────────────────────────────────────────────
+        toast.success("¡Mensaje enviado!", {
+          description: data.message ?? "Nos pondremos en contacto contigo pronto.",
+          duration: 6000,
+        });
+        setFormData(EMPTY_FORM);
+
+      } else if (response.status === 400 && data.errors) {
+        // ── Errores de validación devueltos por PHP (400) ───────────────────
+        setFieldErrors(data.errors);
+        toast.error("Revisa los campos del formulario", {
+          description: data.message ?? "Algunos campos contienen errores.",
+          duration: 5000,
+        });
+
+      } else {
+        // ── Error de servidor o respuesta inesperada ────────────────────────
+        throw new Error(data.message ?? "Error al procesar tu solicitud.");
+      }
+
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "No se pudo conectar con el servidor. Inténtalo más tarde.";
+
+      console.error("[Contactos] Error al enviar formulario:", error);
+      toast.error("Error al enviar el mensaje", {
+        description: message,
+        duration: 7000,
       });
+
     } finally {
       setIsSubmitting(false);
     }
@@ -162,6 +217,7 @@ const Contactos = () => {
                 <h2 className="text-2xl font-bold mb-6">Envíenos un Mensaje</h2>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Nombre */}
                     <div>
                       <label htmlFor="name" className="block text-sm font-medium mb-2">
                         Nombre Completo *
@@ -174,9 +230,18 @@ const Contactos = () => {
                         value={formData.name}
                         onChange={handleChange}
                         placeholder="Juan Pérez"
-                        className="transition-all duration-300 focus:shadow-soft"
+                        aria-invalid={!!fieldErrors.nombre}
+                        aria-describedby={fieldErrors.nombre ? "error-nombre" : undefined}
+                        className={`transition-all duration-300 focus:shadow-soft ${fieldErrors.nombre ? "border-destructive" : ""}`}
                       />
+                      {fieldErrors.nombre && (
+                        <p id="error-nombre" className="mt-1 text-xs text-destructive">
+                          {fieldErrors.nombre}
+                        </p>
+                      )}
                     </div>
+
+                    {/* Email */}
                     <div>
                       <label htmlFor="email" className="block text-sm font-medium mb-2">
                         Correo Electrónico *
@@ -189,12 +254,20 @@ const Contactos = () => {
                         value={formData.email}
                         onChange={handleChange}
                         placeholder="juan@empresa.com"
-                        className="transition-all duration-300 focus:shadow-soft"
+                        aria-invalid={!!fieldErrors.email}
+                        aria-describedby={fieldErrors.email ? "error-email" : undefined}
+                        className={`transition-all duration-300 focus:shadow-soft ${fieldErrors.email ? "border-destructive" : ""}`}
                       />
+                      {fieldErrors.email && (
+                        <p id="error-email" className="mt-1 text-xs text-destructive">
+                          {fieldErrors.email}
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Teléfono */}
                     <div>
                       <label htmlFor="phone" className="block text-sm font-medium mb-2">
                         Teléfono
@@ -205,10 +278,19 @@ const Contactos = () => {
                         type="tel"
                         value={formData.phone}
                         onChange={handleChange}
-                        placeholder="+1 (555) 123-4567"
-                        className="transition-all duration-300 focus:shadow-soft"
+                        placeholder="+57 300 123 4567"
+                        aria-invalid={!!fieldErrors.telefono}
+                        aria-describedby={fieldErrors.telefono ? "error-telefono" : undefined}
+                        className={`transition-all duration-300 focus:shadow-soft ${fieldErrors.telefono ? "border-destructive" : ""}`}
                       />
+                      {fieldErrors.telefono && (
+                        <p id="error-telefono" className="mt-1 text-xs text-destructive">
+                          {fieldErrors.telefono}
+                        </p>
+                      )}
                     </div>
+
+                    {/* Empresa */}
                     <div>
                       <label htmlFor="company" className="block text-sm font-medium mb-2">
                         Empresa
@@ -220,11 +302,19 @@ const Contactos = () => {
                         value={formData.company}
                         onChange={handleChange}
                         placeholder="Mi Empresa S.A."
-                        className="transition-all duration-300 focus:shadow-soft"
+                        aria-invalid={!!fieldErrors.empresa}
+                        aria-describedby={fieldErrors.empresa ? "error-empresa" : undefined}
+                        className={`transition-all duration-300 focus:shadow-soft ${fieldErrors.empresa ? "border-destructive" : ""}`}
                       />
+                      {fieldErrors.empresa && (
+                        <p id="error-empresa" className="mt-1 text-xs text-destructive">
+                          {fieldErrors.empresa}
+                        </p>
+                      )}
                     </div>
                   </div>
 
+                  {/* Mensaje */}
                   <div>
                     <label htmlFor="message" className="block text-sm font-medium mb-2">
                       Mensaje *
@@ -237,8 +327,15 @@ const Contactos = () => {
                       onChange={handleChange}
                       placeholder="Cuéntenos sobre su proyecto o consulta..."
                       rows={6}
-                      className="transition-all duration-300 focus:shadow-soft resize-none"
+                      aria-invalid={!!fieldErrors.mensaje}
+                      aria-describedby={fieldErrors.mensaje ? "error-mensaje" : undefined}
+                      className={`transition-all duration-300 focus:shadow-soft resize-none ${fieldErrors.mensaje ? "border-destructive" : ""}`}
                     />
+                    {fieldErrors.mensaje && (
+                      <p id="error-mensaje" className="mt-1 text-xs text-destructive">
+                        {fieldErrors.mensaje}
+                      </p>
+                    )}
                   </div>
 
                   <Button
