@@ -1,7 +1,7 @@
-import { Toaster as Sonner } from "@/components/ui/sonner";
+﻿import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
 import Layout from "./components/Layout";
 
@@ -22,6 +22,13 @@ import Sst from "./pages/servicios/Sst";
 
 import Mantenimiento from "./components/Mantenimiento";
 
+// Contextos y Componentes Administrativos
+import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/admin/ProtectedRoute";
+import AdminLayout from "./components/admin/AdminLayout";
+import Login from "./pages/admin/Login";
+import Dashboard from "./pages/admin/Dashboard";
+
 // Evaluación segura del flag de mantenimiento con fallback defensivo
 // Si rawMaintenanceEnv no está definido o es "true", se considera en mantenimiento.
 // Solo se desactiva si explícitamente es "false".
@@ -33,36 +40,56 @@ const queryClient = new QueryClient();
 const App = () => {
   const isLocalDev = import.meta.env.DEV;
 
-  // Si está en modo mantenimiento y NO es entorno de desarrollo local, muestra la pantalla de mantenimiento
-  if (IS_MAINTENANCE_MODE && !isLocalDev) {
-    return <Mantenimiento />;
-  }
+  // Estado de mantenimiento aplicable solo a rutas públicas
+  const isMaintenanceActive = IS_MAINTENANCE_MODE && !isLocalDev;
 
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Sonner />
-        <BrowserRouter>
-          <ScrollToTop />
-          <Layout>
+        <AuthProvider>
+          <BrowserRouter>
+            <ScrollToTop />
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/decalogo" element={<Decalogo />} />
-              <Route path="/quienes-somos" element={<QuienesSomos />} />
-              <Route path="/nuestro-equipo" element={<NuestroEquipo />} />
-              <Route path="/nuestros-mercados" element={<NuestrosMercados />} />
-              <Route path="/que-gestionamos" element={<QueGestionamos />} />
-              <Route path="/servicios/supply-chain-management" element={<SupplyChain />} />
-              <Route path="/servicios/gestion-ambiental-sostenibilidad" element={<GestionAmbientalEsg />} />
-              <Route path="/servicios/seguridad-salud-trabajo" element={<Sst />} />
-              <Route path="/servicios/gestion-talento-humano" element={<TalentoHumano />} />
-              <Route path="/servicios/gestion-social-rse" element={<GestionSocial />} />
-              <Route path="/servicios/asesoria-legal" element={<AsesoriaLegal />} />
-              <Route path="/contactos" element={<Contactos />} />
-              <Route path="*" element={<NotFound />} />
+              {/* === RUTAS ADMINISTRATIVAS === */}
+              <Route path="/admin/login" element={<Login />} />
+
+              <Route element={<ProtectedRoute />}>
+                <Route path="/admin" element={<AdminLayout />}>
+                  <Route index element={<Dashboard />} />
+                </Route>
+              </Route>
+
+              {/* === RUTAS PÚBLICAS === */}
+              <Route
+                element={
+                  isMaintenanceActive ? (
+                    <Mantenimiento />
+                  ) : (
+                    <Layout>
+                      <Outlet />
+                    </Layout>
+                  )
+                }
+              >
+                <Route path="/" element={<Index />} />
+                <Route path="/decalogo" element={<Decalogo />} />
+                <Route path="/quienes-somos" element={<QuienesSomos />} />
+                <Route path="/nuestro-equipo" element={<NuestroEquipo />} />
+                <Route path="/nuestros-mercados" element={<NuestrosMercados />} />
+                <Route path="/que-gestionamos" element={<QueGestionamos />} />
+                <Route path="/servicios/supply-chain-management" element={<SupplyChain />} />
+                <Route path="/servicios/gestion-ambiental-sostenibilidad" element={<GestionAmbientalEsg />} />
+                <Route path="/servicios/seguridad-salud-trabajo" element={<Sst />} />
+                <Route path="/servicios/gestion-talento-humano" element={<TalentoHumano />} />
+                <Route path="/servicios/gestion-social-rse" element={<GestionSocial />} />
+                <Route path="/servicios/asesoria-legal" element={<AsesoriaLegal />} />
+                <Route path="/contactos" element={<Contactos />} />
+                <Route path="*" element={<NotFound />} />
+              </Route>
             </Routes>
-          </Layout>
-        </BrowserRouter>
+          </BrowserRouter>
+        </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );
