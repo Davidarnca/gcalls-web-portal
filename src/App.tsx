@@ -1,4 +1,4 @@
-﻿import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
@@ -28,6 +28,7 @@ import ProtectedRoute from "./components/admin/ProtectedRoute";
 import AdminLayout from "./components/admin/AdminLayout";
 import Login from "./pages/admin/Login";
 import Dashboard from "./pages/admin/Dashboard";
+import AdminContactos from "./pages/admin/Contactos";
 
 // Evaluación segura del flag de mantenimiento con fallback defensivo
 // Si rawMaintenanceEnv no está definido o es "true", se considera en mantenimiento.
@@ -57,6 +58,7 @@ const App = () => {
               <Route element={<ProtectedRoute />}>
                 <Route path="/admin" element={<AdminLayout />}>
                   <Route index element={<Dashboard />} />
+                  <Route path="contactos" element={<AdminContactos />} />
                 </Route>
               </Route>
 
