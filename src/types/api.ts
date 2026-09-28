@@ -1,0 +1,62 @@
+﻿/**
+ * G-Calls S.A.S. — Tipos centralizados de la API REST
+ *
+ * Centraliza los contratos de datos compartidos entre el frontend
+ * y el backend PHP. Importar desde aquí en lugar de desde
+ * componentes específicos cuando se necesiten en múltiples lugares.
+ */
+
+// ── Formulario público (payload de envío) ────────────────────────────────────
+// Refleja los campos que acepta POST /api/contactos.php
+export interface ContactoPayload {
+  nombre: string;
+  email: string;
+  empresa: string;
+  telefono: string;
+  mensaje: string;
+  servicio_interes?: number;
+}
+
+// ── Respuesta genérica de la API ─────────────────────────────────────────────
+// Estructura estándar { success, message, data?, errors? }
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  message: string;
+  data?: T;
+  errors?: Record<string, string>;
+}
+
+// ── Estado del pipeline CRM ──────────────────────────────────────────────────
+// Refleja exactamente el ENUM de contactos_leads.estado en MySQL
+export type LeadEstado =
+  | 'nuevo'
+  | 'en_seguimiento'
+  | 'cotizado'
+  | 'ganado'
+  | 'perdido'
+  | 'spam';
+
+// ── Lead: registro almacenado (lectura administrativa) ───────────────────────
+// Representa una fila de contactos_leads tal como la devuelve
+// GET /api/admin/contactos.php — distinto a ContactoPayload (escritura)
+export interface Lead {
+  id: number;                       // INT UNSIGNED NOT NULL AUTO_INCREMENT
+  nombre: string;                   // VARCHAR(120) NOT NULL
+  empresa: string | null;           // VARCHAR(180) DEFAULT NULL
+  email: string;                    // VARCHAR(180) NOT NULL
+  telefono: string | null;          // VARCHAR(30) DEFAULT NULL
+  servicio_interes: number | null;  // INT UNSIGNED DEFAULT NULL (FK)
+  mensaje: string | null;           // TEXT DEFAULT NULL
+  estado: LeadEstado;               // ENUM NOT NULL DEFAULT 'nuevo'
+  fecha_registro: string;           // DATETIME → 'YYYY-MM-DD HH:MM:SS'
+}
+
+// ── Respuesta del GET /api/admin/contactos.php ───────────────────────────────
+export interface LeadsListResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    leads: Lead[];
+    total: number;   // número de registros devueltos (= leads.length en v1)
+  };
+}
