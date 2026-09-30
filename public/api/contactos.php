@@ -1,12 +1,12 @@
 ﻿<?php
 /**
- * G-Calls S.A.S. — Endpoint: POST /api/contactos
+ * G-Calls S.A.S. â€” Endpoint: POST /api/contactos
  *
  * Recibe solicitudes de contacto/lead desde el portal web,
  * valida y sanitiza los datos, y los persiste en `contactos_leads`.
  *
  * Contrato de la API:
- * ──────────────────────────────────────────────────────────────────
+ * â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
  *  Metodo:   POST
  *  URL:      /api/contactos.php
  *  Body:     JSON  { nombre, email, empresa?, telefono?, servicio_interes?, mensaje? }
@@ -19,23 +19,24 @@
  *
  *  Errores de servidor (500):
  *    { "success": false, "message": "Error interno del servidor." }
- * ──────────────────────────────────────────────────────────────────
+ * â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
  *
  * PHP 8.0+  |  Requiere PDO + pdo_mysql
  */
 
 declare(strict_types=1);
 
-// ── Bootstrap ─────────────────────────────────────────────────────────────────
+// â”€â”€ Bootstrap â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 require_once __DIR__ . '/config/cors.php';   // Cabeceras CORS + preflight guard
 require_once __DIR__ . '/config/db.php';     // get_db_connection()
+require_once __DIR__ . '/config/helpers.php'; // json_response() y utilidades comÃºn
 
-// ── Solo aceptamos POST ───────────────────────────────────────────────────────
+// â”€â”€ Solo aceptamos POST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     json_response(false, 'Metodo no permitido. Usa POST.', httpCode: 405);
 }
 
-// ── Lectura del body JSON ─────────────────────────────────────────────────────
+// â”€â”€ Lectura del body JSON â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $raw_body = file_get_contents('php://input');
 $payload  = json_decode($raw_body, associative: true);
 
@@ -43,7 +44,7 @@ if (!is_array($payload)) {
     json_response(false, 'El cuerpo de la solicitud debe ser JSON valido.', httpCode: 400);
 }
 
-// ── Validacion y sanitizacion ─────────────────────────────────────────────────
+// â”€â”€ Validacion y sanitizacion â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 $errors = [];
 
 // --- nombre (obligatorio) ---
@@ -94,12 +95,12 @@ if ($servicio_raw !== null && $servicio_raw !== '') {
 // --- mensaje (opcional) ---
 $mensaje = sanitize_string($payload['mensaje'] ?? '');
 $mensaje = $mensaje !== '' ? $mensaje : null;
-// Sin limite de longitud estricto — TEXT en BD, pero prevenimos abusos
+// Sin limite de longitud estricto â€” TEXT en BD, pero prevenimos abusos
 if ($mensaje !== null && mb_strlen($mensaje) > 5000) {
     $errors['mensaje'] = 'El mensaje no puede superar los 5000 caracteres.';
 }
 
-// ── Respuesta temprana si hay errores de validacion ───────────────────────────
+// â”€â”€ Respuesta temprana si hay errores de validacion â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if (!empty($errors)) {
     json_response(
         success: false,
@@ -109,7 +110,7 @@ if (!empty($errors)) {
     );
 }
 
-// ── Verificacion de servicio existente (si se envio) ─────────────────────────
+// â”€â”€ Verificacion de servicio existente (si se envio) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if ($servicio_interes !== null) {
     try {
         $pdo  = get_db_connection();
@@ -119,7 +120,7 @@ if ($servicio_interes !== null) {
         $stmt->execute([':id' => $servicio_interes]);
 
         if ($stmt->fetchColumn() === false) {
-            // Servicio no existe o esta inactivo — no bloqueamos el lead,
+            // Servicio no existe o esta inactivo â€” no bloqueamos el lead,
             // simplemente ignoramos el servicio para no perder el contacto
             $servicio_interes = null;
         }
@@ -129,7 +130,7 @@ if ($servicio_interes !== null) {
     }
 }
 
-// ── Insercion en base de datos ────────────────────────────────────────────────
+// â”€â”€ Insercion en base de datos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 try {
     $pdo = get_db_connection();
 
@@ -153,11 +154,11 @@ try {
     $new_id = (int) $pdo->lastInsertId();
 
     // Loguea el nuevo lead (util en desarrollo y para auditoria basica)
-    error_log("[G-Calls] Nuevo lead registrado — ID: {$new_id}, Email: {$email}");
+    error_log("[G-Calls] Nuevo lead registrado â€” ID: {$new_id}, Email: {$email}");
 
     json_response(
         success:  true,
-        message:  '¡Gracias por contactarnos! Nos pondremos en contacto contigo pronto.',
+        message:  'Â¡Gracias por contactarnos! Nos pondremos en contacto contigo pronto.',
         data:     [
             'id'             => $new_id,
             'estado'         => 'nuevo',
@@ -167,7 +168,7 @@ try {
     );
 
 } catch (RuntimeException $e) {
-    // Error de conexion — ya logueado en db.php
+    // Error de conexion â€” ya logueado en db.php
     json_response(false, 'No se pudo procesar tu solicitud. Intentalo de nuevo.', httpCode: 503);
 
 } catch (PDOException $e) {
@@ -178,45 +179,8 @@ try {
 
 
 // =============================================================================
-// FUNCIONES AUXILIARES
+// FUNCIONES AUXILIARES ESPECÃFICAS
 // =============================================================================
-
-/**
- * Emite una respuesta JSON estandarizada y termina la ejecucion.
- *
- * Estructura de respuesta:
- *   { "success": bool, "message": string, "data": mixed }
- *
- * @param bool        $success   Indica si la operacion fue exitosa.
- * @param string      $message   Mensaje legible para el cliente.
- * @param array|null  $data      Datos adicionales (errores, IDs, etc.).
- * @param int         $httpCode  Codigo de estado HTTP a enviar.
- */
-function json_response(
-    bool   $success,
-    string $message,
-    ?array $data     = null,
-    int    $httpCode = 200
-): never {
-    http_response_code($httpCode);
-
-    $body = [
-        'success' => $success,
-        'message' => $message,
-    ];
-
-    if ($data !== null) {
-        // Si data contiene 'errors', lo anidamos directamente para mayor claridad
-        if (isset($data['errors'])) {
-            $body['errors'] = $data['errors'];
-        } else {
-            $body['data'] = $data;
-        }
-    }
-
-    echo json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    exit;
-}
 
 /**
  * Sanitiza un string eliminando espacios extremos y etiquetas HTML.
