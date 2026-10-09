@@ -26,3 +26,6 @@ dist-ssr
 # Variables de entorno (¡Seguridad!)
 .env
 .env.production
+
+# Respaldos locales de la base de datos
+gcalls_db_backup_antes_schema.sql

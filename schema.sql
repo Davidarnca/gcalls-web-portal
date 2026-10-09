@@ -1,8 +1,8 @@
-﻿-- =============================================================================
+-- =============================================================================
 -- G-Calls S.A.S. -- Schema inicial de base de datos
 -- Fase 1: Backend -- Tablas principales
 --
--- Motor:        MySQL 8.0+ (compatible con MySQL 5.7 excepto donde se indique)
+-- Motor:        MySQL 8.0.29+ (requerido -- ver PREREQUISITO a continuacion)
 -- Codificacion: utf8mb4 / utf8mb4_unicode_ci  (soporte completo Unicode + emojis)
 -- Idempotente:  Si -- seguro de ejecutar multiples veces sin errores
 --
@@ -11,6 +11,17 @@
 --   2. servicios
 --   3. contactos_leads
 --   4. cotizaciones
+--
+-- =============================================================================
+-- PREREQUISITO OBLIGATORIO
+-- =============================================================================
+-- Antes de ejecutar SOURCE schema.sql, verificar la version real del servidor:
+--
+--   SELECT VERSION();
+--
+-- El resultado debe ser >= 8.0.29.
+-- CREATE PROCEDURE IF NOT EXISTS fue introducido en MySQL 8.0.29.
+-- Si la version es inferior, NO ejecutar este script sin revision previa del plan.
 -- =============================================================================
 
 -- Selecciona (o crea) la base de datos del proyecto.
@@ -53,12 +64,6 @@ CREATE TABLE IF NOT EXISTS usuarios (
   COLLATE=utf8mb4_unicode_ci
   COMMENT='Cuentas de acceso al portal administrativo de G-Calls';
 
--- Indice: busqueda por rol para listar usuarios por tipo de acceso
--- CREATE INDEX IF NOT EXISTS requiere MySQL 8.0.29+
--- En MySQL 5.7 usa: ALTER TABLE usuarios ADD INDEX IF NOT EXISTS idx_usuarios_rol (rol);
-CREATE INDEX IF NOT EXISTS idx_usuarios_rol
-  ON usuarios (rol);
-
 
 -- =============================================================================
 -- TABLA 2: servicios
@@ -94,14 +99,6 @@ CREATE TABLE IF NOT EXISTS servicios (
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
   COMMENT='Catalogo de servicios publicados en el portal de G-Calls';
-
--- Indice: filtrar servicios activos es la query mas frecuente en el portal publico
-CREATE INDEX IF NOT EXISTS idx_servicios_activo
-  ON servicios (activo);
-
--- Indice: busqueda por titulo (util en buscadores internos del panel admin)
-CREATE INDEX IF NOT EXISTS idx_servicios_titulo
-  ON servicios (titulo);
 
 
 -- =============================================================================
@@ -146,22 +143,6 @@ CREATE TABLE IF NOT EXISTS contactos_leads (
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci
   COMMENT='Prospectos y solicitudes de contacto captados por el portal';
-
--- Indice: filtrar leads por estado es la operacion principal del pipeline CRM
-CREATE INDEX IF NOT EXISTS idx_leads_estado
-  ON contactos_leads (estado);
-
--- Indice: buscar leads de un servicio especifico
-CREATE INDEX IF NOT EXISTS idx_leads_servicio_interes
-  ON contactos_leads (servicio_interes);
-
--- Indice: ordenar y filtrar por fecha de registro (reportes, dashboards)
-CREATE INDEX IF NOT EXISTS idx_leads_fecha_registro
-  ON contactos_leads (fecha_registro);
-
--- Indice: busqueda de leads por email (deduplicacion, historial de cliente)
-CREATE INDEX IF NOT EXISTS idx_leads_email
-  ON contactos_leads (email);
 
 
 -- =============================================================================
@@ -215,17 +196,122 @@ CREATE TABLE IF NOT EXISTS cotizaciones (
   COLLATE=utf8mb4_unicode_ci
   COMMENT='Propuestas economicas formales generadas para leads calificados';
 
+
+-- =============================================================================
+-- PROCEDIMIENTO AUXILIAR: gcalls_add_index
+-- =============================================================================
+-- Crea un indice solo si no existe, consultando information_schema.STATISTICS.
+-- No modifica ni elimina tablas, datos ni indices existentes.
+-- No ejecuta ninguna operacion DROP.
+--
+-- CREATE PROCEDURE IF NOT EXISTS garantiza idempotencia:
+--   - Primera ejecucion: crea el procedimiento y lo llama 10 veces.
+--   - Segunda ejecucion: IF NOT EXISTS omite la creacion; CALL usa la
+--     definicion existente, que sigue siendo valida porque el cuerpo es
+--     un utilitario generico y parametrico sin logica dependiente del schema.
+--
+-- NOTA IMPORTANTE: si en el futuro el cuerpo del procedimiento necesitara
+-- cambiar, CREATE PROCEDURE IF NOT EXISTS NO actualizaria la definicion
+-- existente. En ese caso se requiere intervencion manual del operador:
+--   SHOW CREATE PROCEDURE gcalls_add_index;
+-- El procedimiento permanece en la BD de forma intencional (prefijo gcalls_).
+-- =============================================================================
+
+DELIMITER $$
+
+CREATE PROCEDURE IF NOT EXISTS gcalls_add_index(
+    IN p_schema  VARCHAR(64),
+    IN p_table   VARCHAR(64),
+    IN p_index   VARCHAR(64),
+    IN p_ddl     TEXT
+)
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM   information_schema.STATISTICS
+        WHERE  TABLE_SCHEMA = p_schema
+          AND  TABLE_NAME   = p_table
+          AND  INDEX_NAME   = p_index
+    ) THEN
+        SET @gcalls_ddl = p_ddl;
+        PREPARE gcalls_stmt FROM @gcalls_ddl;
+        EXECUTE gcalls_stmt;
+        DEALLOCATE PREPARE gcalls_stmt;
+    END IF;
+END$$
+
+DELIMITER ;
+
+
+-- =============================================================================
+-- INDICES CONDICIONALES (10 en total)
+-- Cada CALL verifica information_schema.STATISTICS antes de crear el indice.
+-- Si el indice ya existe, lo omite silenciosamente. Sin DROP. Sin error.
+-- =============================================================================
+
+-- TABLA 1: usuarios
+-- Indice: busqueda por rol para listar usuarios por tipo de acceso
+CALL gcalls_add_index(
+    'gcalls_db', 'usuarios', 'idx_usuarios_rol',
+    'CREATE INDEX idx_usuarios_rol ON usuarios (rol)'
+);
+
+-- TABLA 2: servicios
+-- Indice: filtrar servicios activos es la query mas frecuente en el portal publico
+CALL gcalls_add_index(
+    'gcalls_db', 'servicios', 'idx_servicios_activo',
+    'CREATE INDEX idx_servicios_activo ON servicios (activo)'
+);
+
+-- Indice: busqueda por titulo (util en buscadores internos del panel admin)
+CALL gcalls_add_index(
+    'gcalls_db', 'servicios', 'idx_servicios_titulo',
+    'CREATE INDEX idx_servicios_titulo ON servicios (titulo)'
+);
+
+-- TABLA 3: contactos_leads
+-- Indice: filtrar leads por estado es la operacion principal del pipeline CRM
+CALL gcalls_add_index(
+    'gcalls_db', 'contactos_leads', 'idx_leads_estado',
+    'CREATE INDEX idx_leads_estado ON contactos_leads (estado)'
+);
+
+-- Indice: buscar leads de un servicio especifico
+CALL gcalls_add_index(
+    'gcalls_db', 'contactos_leads', 'idx_leads_servicio_interes',
+    'CREATE INDEX idx_leads_servicio_interes ON contactos_leads (servicio_interes)'
+);
+
+-- Indice: ordenar y filtrar por fecha de registro (reportes, dashboards)
+CALL gcalls_add_index(
+    'gcalls_db', 'contactos_leads', 'idx_leads_fecha_registro',
+    'CREATE INDEX idx_leads_fecha_registro ON contactos_leads (fecha_registro)'
+);
+
+-- Indice: busqueda de leads por email (deduplicacion, historial de cliente)
+CALL gcalls_add_index(
+    'gcalls_db', 'contactos_leads', 'idx_leads_email',
+    'CREATE INDEX idx_leads_email ON contactos_leads (email)'
+);
+
+-- TABLA 4: cotizaciones
 -- Indice: obtener todas las cotizaciones de un lead (relacion 1:N frecuente)
-CREATE INDEX IF NOT EXISTS idx_cotizaciones_lead_id
-  ON cotizaciones (lead_id);
+CALL gcalls_add_index(
+    'gcalls_db', 'cotizaciones', 'idx_cotizaciones_lead_id',
+    'CREATE INDEX idx_cotizaciones_lead_id ON cotizaciones (lead_id)'
+);
 
 -- Indice: filtrar cotizaciones por estado (pipeline comercial y reportes)
-CREATE INDEX IF NOT EXISTS idx_cotizaciones_estado
-  ON cotizaciones (estado);
+CALL gcalls_add_index(
+    'gcalls_db', 'cotizaciones', 'idx_cotizaciones_estado',
+    'CREATE INDEX idx_cotizaciones_estado ON cotizaciones (estado)'
+);
 
 -- Indice: ordenar por fecha de creacion en dashboards y exportaciones
-CREATE INDEX IF NOT EXISTS idx_cotizaciones_fecha_creacion
-  ON cotizaciones (fecha_creacion);
+CALL gcalls_add_index(
+    'gcalls_db', 'cotizaciones', 'idx_cotizaciones_fecha_creacion',
+    'CREATE INDEX idx_cotizaciones_fecha_creacion ON cotizaciones (fecha_creacion)'
+);
 
 
 -- =============================================================================
@@ -235,14 +321,51 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 
 -- =============================================================================
--- VERIFICACION RAPIDA (opcional -- ejecutar manualmente para confirmar estructura)
+-- VERIFICACION PREVIA (ejecutar ANTES de SOURCE schema.sql)
+-- =============================================================================
+-- SELECT VERSION();
+-- -- Confirmar que el resultado es >= 8.0.29 antes de continuar.
+--
+-- SHOW TABLES IN gcalls_db;
+-- -- Esperado actual: solo 'usuarios'
+--
+-- SHOW INDEX FROM usuarios;
+-- -- Esperado actual: PRIMARY, uq_usuarios_email
+-- -- Confirmar ausencia de idx_usuarios_rol
+-- =============================================================================
+
+-- =============================================================================
+-- VERIFICACION POSTERIOR (ejecutar DESPUES de SOURCE schema.sql)
 -- =============================================================================
 -- SHOW TABLES;
--- DESCRIBE usuarios;
--- DESCRIBE servicios;
--- DESCRIBE contactos_leads;
--- DESCRIBE cotizaciones;
--- SHOW CREATE TABLE cotizaciones\G
+-- -- Esperado: usuarios, servicios, contactos_leads, cotizaciones
+--
+-- SHOW INDEX FROM usuarios;
+-- -- Esperado: PRIMARY, uq_usuarios_email, idx_usuarios_rol
+--
+-- SHOW INDEX FROM servicios;
+-- -- Esperado: PRIMARY, uq_servicios_slug, idx_servicios_activo, idx_servicios_titulo
+--
+-- SHOW INDEX FROM contactos_leads;
+-- -- Esperado: PRIMARY, fk_leads_servicio (implicito InnoDB),
+-- --           idx_leads_estado, idx_leads_servicio_interes,
+-- --           idx_leads_fecha_registro, idx_leads_email
+--
+-- SHOW INDEX FROM cotizaciones;
+-- -- Esperado: PRIMARY, uq_cotizaciones_codigo, fk_cotizaciones_lead (implicito),
+-- --           idx_cotizaciones_lead_id, idx_cotizaciones_estado,
+-- --           idx_cotizaciones_fecha_creacion
+--
+-- SELECT TABLE_NAME, CONSTRAINT_NAME, CONSTRAINT_TYPE
+-- FROM information_schema.TABLE_CONSTRAINTS
+-- WHERE TABLE_SCHEMA = 'gcalls_db'
+-- ORDER BY TABLE_NAME, CONSTRAINT_TYPE;
+-- -- Esperado FKs: fk_leads_servicio, fk_cotizaciones_lead
+--
+-- SHOW PROCEDURE STATUS WHERE Db = 'gcalls_db';
+-- -- Esperado: gcalls_add_index presente (permanente, intencional)
+-- =============================================================================
+
 -- =============================================================================
 -- FIN DEL SCRIPT -- G-Calls S.A.S. Fase 1 Backend
 -- =============================================================================
