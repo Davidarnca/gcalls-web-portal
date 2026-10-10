@@ -41,7 +41,13 @@ const Contactos = () => {
   // Estado de validación por campo — muestra errores devueltos por la API
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  const EMPTY_FORM = { name: "", email: "", phone: "", company: "", message: "" };
+  const EMPTY_FORM = {
+    name: "",
+    email: "",
+    phone: "",
+    company: "",
+    message: "",
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,28 +56,19 @@ const Contactos = () => {
 
     // Construye el payload usando los nombres de campo del contrato PHP
     const payload: ContactoPayload = {
-      nombre:   formData.name.trim(),
-      email:    formData.email.trim(),
-      empresa:  formData.company.trim(),
+      nombre: formData.name.trim(),
+      email: formData.email.trim(),
+      empresa: formData.company.trim(),
       telefono: formData.phone.trim(),
-      mensaje:  formData.message.trim(),
+      mensaje: formData.message.trim(),
     };
 
     try {
-      let response;
-      
-      if (import.meta.env.DEV) {
-        // En desarrollo, usamos la capa de Mock
-        const { mockFetchContacto } = await import("@/lib/api/contactos.mock");
-        response = await mockFetchContacto(payload);
-      } else {
-        // En producción, petición real al backend PHP
-        response = await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-      }
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
       // Intentamos parsear siempre — la API siempre devuelve JSON
       let data: ApiResponse;
@@ -84,11 +81,11 @@ const Contactos = () => {
       if (response.ok && data.success) {
         // ── Éxito ───────────────────────────────────────────────────────────
         toast.success("¡Mensaje enviado!", {
-          description: data.message ?? "Nos pondremos en contacto contigo pronto.",
+          description:
+            data.message ?? "Nos pondremos en contacto contigo pronto.",
           duration: 6000,
         });
         setFormData(EMPTY_FORM);
-
       } else if (response.status === 400 && data.errors) {
         // ── Errores de validación devueltos por PHP (400) ───────────────────
         setFieldErrors(data.errors);
@@ -96,12 +93,10 @@ const Contactos = () => {
           description: data.message ?? "Algunos campos contienen errores.",
           duration: 5000,
         });
-
       } else {
         // ── Error de servidor o respuesta inesperada ────────────────────────
         throw new Error(data.message ?? "Error al procesar tu solicitud.");
       }
-
     } catch (error: unknown) {
       const message =
         error instanceof Error
@@ -113,14 +108,13 @@ const Contactos = () => {
         description: message,
         duration: 7000,
       });
-
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -150,7 +144,9 @@ const Contactos = () => {
   ];
 
   return (
-    <>      {/* Hero Section */}
+    <>
+      {" "}
+      {/* Hero Section */}
       <section className="pt-28 md:pt-32 lg:pt-36 pb-20 gradient-primary text-white">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="max-w-4xl mx-auto text-center animate-fade-in">
@@ -158,13 +154,13 @@ const Contactos = () => {
               Contáctenos
             </h1>
             <p className="text-lg md:text-xl text-white/90 leading-relaxed">
-              Estamos aquí para ayudarle a transformar su empresa. 
-              Envíenos un mensaje y uno de nuestros expertos se pondrá en contacto con usted.
+              Estamos aquí para ayudarle a transformar su empresa. Envíenos un
+              mensaje y uno de nuestros expertos se pondrá en contacto con
+              usted.
             </p>
           </div>
         </div>
       </section>
-
       {/* Contact Section */}
       <section className="py-20 bg-gradient-subtle">
         <div className="container mx-auto px-4 lg:px-8">
@@ -172,7 +168,9 @@ const Contactos = () => {
             {/* Contact Info */}
             <div className="lg:col-span-1 space-y-6">
               <div className="animate-fade-in">
-                <h2 className="text-2xl font-bold mb-6">Información de Contacto</h2>
+                <h2 className="text-2xl font-bold mb-6">
+                  Información de Contacto
+                </h2>
                 <div className="space-y-4">
                   {contactInfo.map((info, index) => {
                     const Icon = info.icon;
@@ -186,13 +184,18 @@ const Contactos = () => {
                           className="flex items-start gap-4 group"
                         >
                           <div className="w-12 h-12 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0 group-hover:animate-float">
-                            <Icon className="text-primary-foreground" size={24} />
+                            <Icon
+                              className="text-primary-foreground"
+                              size={24}
+                            />
                           </div>
                           <div>
                             <h3 className="font-semibold mb-1 group-hover:text-primary transition-colors">
                               {info.title}
                             </h3>
-                            <p className="text-muted-foreground">{info.value}</p>
+                            <p className="text-muted-foreground">
+                              {info.value}
+                            </p>
                           </div>
                         </a>
                       </Card>
@@ -202,7 +205,9 @@ const Contactos = () => {
               </div>
 
               <Card className="p-6 gradient-secondary text-white">
-                <h3 className="text-xl font-semibold mb-3">Horario de Atención</h3>
+                <h3 className="text-xl font-semibold mb-3">
+                  Horario de Atención
+                </h3>
                 <div className="space-y-2 text-white/90">
                   <p>Lunes a Viernes: 8:00 AM - 6:00 PM</p>
                   <p>Sábados: 9:00 AM - 1:00 PM</p>
@@ -219,7 +224,10 @@ const Contactos = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Nombre */}
                     <div>
-                      <label htmlFor="name" className="block text-sm font-medium mb-2">
+                      <label
+                        htmlFor="name"
+                        className="block text-sm font-medium mb-2"
+                      >
                         Nombre Completo *
                       </label>
                       <Input
@@ -231,11 +239,16 @@ const Contactos = () => {
                         onChange={handleChange}
                         placeholder="Juan Pérez"
                         aria-invalid={!!fieldErrors.nombre}
-                        aria-describedby={fieldErrors.nombre ? "error-nombre" : undefined}
+                        aria-describedby={
+                          fieldErrors.nombre ? "error-nombre" : undefined
+                        }
                         className={`transition-all duration-300 focus:shadow-soft ${fieldErrors.nombre ? "border-destructive" : ""}`}
                       />
                       {fieldErrors.nombre && (
-                        <p id="error-nombre" className="mt-1 text-xs text-destructive">
+                        <p
+                          id="error-nombre"
+                          className="mt-1 text-xs text-destructive"
+                        >
                           {fieldErrors.nombre}
                         </p>
                       )}
@@ -243,7 +256,10 @@ const Contactos = () => {
 
                     {/* Email */}
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium mb-2">
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-medium mb-2"
+                      >
                         Correo Electrónico *
                       </label>
                       <Input
@@ -255,11 +271,16 @@ const Contactos = () => {
                         onChange={handleChange}
                         placeholder="juan@empresa.com"
                         aria-invalid={!!fieldErrors.email}
-                        aria-describedby={fieldErrors.email ? "error-email" : undefined}
+                        aria-describedby={
+                          fieldErrors.email ? "error-email" : undefined
+                        }
                         className={`transition-all duration-300 focus:shadow-soft ${fieldErrors.email ? "border-destructive" : ""}`}
                       />
                       {fieldErrors.email && (
-                        <p id="error-email" className="mt-1 text-xs text-destructive">
+                        <p
+                          id="error-email"
+                          className="mt-1 text-xs text-destructive"
+                        >
                           {fieldErrors.email}
                         </p>
                       )}
@@ -269,7 +290,10 @@ const Contactos = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Teléfono */}
                     <div>
-                      <label htmlFor="phone" className="block text-sm font-medium mb-2">
+                      <label
+                        htmlFor="phone"
+                        className="block text-sm font-medium mb-2"
+                      >
                         Teléfono
                       </label>
                       <Input
@@ -280,11 +304,16 @@ const Contactos = () => {
                         onChange={handleChange}
                         placeholder="+57 300 123 4567"
                         aria-invalid={!!fieldErrors.telefono}
-                        aria-describedby={fieldErrors.telefono ? "error-telefono" : undefined}
+                        aria-describedby={
+                          fieldErrors.telefono ? "error-telefono" : undefined
+                        }
                         className={`transition-all duration-300 focus:shadow-soft ${fieldErrors.telefono ? "border-destructive" : ""}`}
                       />
                       {fieldErrors.telefono && (
-                        <p id="error-telefono" className="mt-1 text-xs text-destructive">
+                        <p
+                          id="error-telefono"
+                          className="mt-1 text-xs text-destructive"
+                        >
                           {fieldErrors.telefono}
                         </p>
                       )}
@@ -292,7 +321,10 @@ const Contactos = () => {
 
                     {/* Empresa */}
                     <div>
-                      <label htmlFor="company" className="block text-sm font-medium mb-2">
+                      <label
+                        htmlFor="company"
+                        className="block text-sm font-medium mb-2"
+                      >
                         Empresa
                       </label>
                       <Input
@@ -303,11 +335,16 @@ const Contactos = () => {
                         onChange={handleChange}
                         placeholder="Mi Empresa S.A."
                         aria-invalid={!!fieldErrors.empresa}
-                        aria-describedby={fieldErrors.empresa ? "error-empresa" : undefined}
+                        aria-describedby={
+                          fieldErrors.empresa ? "error-empresa" : undefined
+                        }
                         className={`transition-all duration-300 focus:shadow-soft ${fieldErrors.empresa ? "border-destructive" : ""}`}
                       />
                       {fieldErrors.empresa && (
-                        <p id="error-empresa" className="mt-1 text-xs text-destructive">
+                        <p
+                          id="error-empresa"
+                          className="mt-1 text-xs text-destructive"
+                        >
                           {fieldErrors.empresa}
                         </p>
                       )}
@@ -316,7 +353,10 @@ const Contactos = () => {
 
                   {/* Mensaje */}
                   <div>
-                    <label htmlFor="message" className="block text-sm font-medium mb-2">
+                    <label
+                      htmlFor="message"
+                      className="block text-sm font-medium mb-2"
+                    >
                       Mensaje *
                     </label>
                     <Textarea
@@ -328,11 +368,16 @@ const Contactos = () => {
                       placeholder="Cuéntenos sobre su proyecto o consulta..."
                       rows={6}
                       aria-invalid={!!fieldErrors.mensaje}
-                      aria-describedby={fieldErrors.mensaje ? "error-mensaje" : undefined}
+                      aria-describedby={
+                        fieldErrors.mensaje ? "error-mensaje" : undefined
+                      }
                       className={`transition-all duration-300 focus:shadow-soft resize-none ${fieldErrors.mensaje ? "border-destructive" : ""}`}
                     />
                     {fieldErrors.mensaje && (
-                      <p id="error-mensaje" className="mt-1 text-xs text-destructive">
+                      <p
+                        id="error-mensaje"
+                        className="mt-1 text-xs text-destructive"
+                      >
                         {fieldErrors.mensaje}
                       </p>
                     )}
@@ -344,7 +389,11 @@ const Contactos = () => {
                     disabled={isSubmitting}
                     className="w-full gradient-primary hover:shadow-glow transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
                   >
-                    {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send size={20} />}
+                    {isSubmitting ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <Send size={20} />
+                    )}
                     {isSubmitting ? "Enviando mensaje..." : "Enviar Mensaje"}
                   </Button>
                 </form>
@@ -353,7 +402,8 @@ const Contactos = () => {
           </div>
         </div>
       </section>
-    </>  );
+    </>
+  );
 };
 
 export default Contactos;

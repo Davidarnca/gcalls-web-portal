@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * G-Calls S.A.S. â€” Endpoint: POST /api/contactos
  *
@@ -153,16 +153,22 @@ try {
 
     $new_id = (int) $pdo->lastInsertId();
 
+    $stmtFecha = $pdo->prepare(
+        'SELECT fecha_registro FROM contactos_leads WHERE id = :id'
+    );
+    $stmtFecha->execute([':id' => $new_id]);
+    $fechaRegistro = $stmtFecha->fetchColumn();
+
     // Loguea el nuevo lead (util en desarrollo y para auditoria basica)
     error_log("[G-Calls] Nuevo lead registrado â€” ID: {$new_id}, Email: {$email}");
 
     json_response(
         success:  true,
-        message:  'Â¡Gracias por contactarnos! Nos pondremos en contacto contigo pronto.',
+        message:  '¡Gracias por contactarnos! Nos pondremos en contacto contigo pronto.',
         data:     [
             'id'             => $new_id,
             'estado'         => 'nuevo',
-            'fecha_registro' => date('Y-m-d H:i:s'),
+            'fecha_registro' => $fechaRegistro,
         ],
         httpCode: 200
     );
