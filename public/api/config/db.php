@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * G-Calls S.A.S. — Conexion PDO a MySQL
  *

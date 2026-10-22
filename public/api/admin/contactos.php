@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * G-Calls S.A.S. â€” Endpoint: GET /api/admin/contactos
  *

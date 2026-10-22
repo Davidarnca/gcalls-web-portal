@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * G-Calls S.A.S. — Endpoint: GET /api/auth/me.php
  *

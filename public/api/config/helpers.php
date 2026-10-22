@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * G-Calls S.A.S. — Utilidades transversales de API
  *

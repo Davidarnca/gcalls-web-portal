@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * G-Calls S.A.S. — Endpoint: POST /api/auth/logout.php
  *

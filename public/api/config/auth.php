@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * G-Calls S.A.S. — Middleware de Autenticación y Sesiones
  *
