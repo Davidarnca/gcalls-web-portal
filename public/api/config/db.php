@@ -15,14 +15,30 @@
 
 declare(strict_types=1);
 
+// Carga variables del archivo .env local antes de que env() sea invocada.
+// En produccion, si las variables ya estan en el entorno del proceso, env.php
+// las respeta y no las sobrescribe. Ver: public/api/config/env.php
+require_once __DIR__ . '/env.php';
+
 /**
  * Lee una variable de entorno y devuelve su valor o un default.
- * Soporta tanto variables del sistema como archivos .env cargados
- * manualmente (via $_ENV o $_SERVER).
+ *
+ * Prioridad (de mayor a menor):
+ *   1. $_ENV      — variable definida en el proceso PHP
+ *   2. $_SERVER   — variable inyectada por el servidor web
+ *   3. getenv()   — variable del sistema operativo
+ *   4. $default   — valor de respaldo
+ *
+ * Una variable definida con valor vacio ('') en cualquiera de las tres fuentes
+ * anteriores se considera explicitamente configurada y tiene prioridad sobre $default.
+ * Se usa array_key_exists (no isset) para distinguir clave ausente de valor vacio.
  */
 function env(string $key, string $default = ''): string
 {
-    return (string) ($_ENV[$key] ?? $_SERVER[$key] ?? getenv($key) ?: $default);
+    if (array_key_exists($key, $_ENV))    return (string) $_ENV[$key];
+    if (array_key_exists($key, $_SERVER)) return (string) $_SERVER[$key];
+    $env_val = getenv($key);
+    return $env_val !== false ? (string) $env_val : $default;
 }
 
 /**
@@ -50,6 +66,15 @@ function get_db_connection(): PDO
     $user    = env('DB_USER',    'root');
     $pass    = env('DB_PASS',    '');
     $charset = env('DB_CHARSET', 'utf8mb4');
+
+    // ── Diagnóstico previo de credenciales ───────────────────────────────────
+    if ($pass === '') {
+        error_log(
+            '[G-Calls DB] Advertencia: DB_PASS esta vacio. ' .
+            'Si MySQL requiere contrasena, la conexion fallara con error 1045. ' .
+            'Verifica que DB_PASS este definido en .env o en el entorno del proceso.'
+        );
+    }
 
     // ── DSN ──────────────────────────────────────────────────────────────────
     $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset={$charset}";
