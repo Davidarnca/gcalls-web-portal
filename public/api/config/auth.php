@@ -12,6 +12,22 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/helpers.php';
 
+/** Nombre de la cookie de sesión del panel administrativo. */
+const GCALLS_SESSION_NAME = 'GCALLS_SESSID';
+
+/** Timeout por inactividad: 2 horas. */
+const GCALLS_IDLE_TIMEOUT = 7200;
+
+/**
+ * Indica si la solicitud actual llegó por HTTPS (directo o detrás de un proxy).
+ */
+function is_https_request(): bool
+{
+    return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443)
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
+}
+
 /**
  * Inicializa de forma centralizada y segura la sesión PHP.
  * Establece directivas de seguridad estrictas antes de invocar session_start().
@@ -26,22 +42,45 @@ function start_secure_session(): void
     ini_set('session.use_only_cookies', '1');
     ini_set('session.cookie_httponly', '1');
 
-    $is_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-        || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443)
-        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
+    // Los datos de sesión deben sobrevivir en el servidor al menos lo mismo que el
+    // idle timeout. Con el valor por defecto de PHP (1440 s) el recolector del
+    // hosting puede borrar la sesión a los 24 minutos de inactividad.
+    ini_set('session.gc_maxlifetime', (string) GCALLS_IDLE_TIMEOUT);
 
-    session_name('GCALLS_SESSID');
+    session_name(GCALLS_SESSION_NAME);
 
     session_set_cookie_params([
-        'lifetime' => 28800,        // 8 horas de vida de la cookie en el cliente
+        'lifetime' => 28800,               // 8 horas de vida de la cookie en el cliente
         'path'     => '/',
-        'domain'   => '',           // Dominio actual
-        'secure'   => $is_https,    // True bajo HTTPS (producción); False en HTTP (desarrollo local)
-        'httponly' => true,         // Inaccesible desde JavaScript (mitigación XSS)
-        'samesite' => 'Lax',        // Mitigación base para navegación cross-site
+        'domain'   => '',                  // Dominio actual
+        'secure'   => is_https_request(),  // True bajo HTTPS (producción); False en HTTP (desarrollo local)
+        'httponly' => true,                // Inaccesible desde JavaScript (mitigación XSS)
+        'samesite' => 'Lax',               // Mitigación base para navegación cross-site
     ]);
 
     session_start();
+}
+
+/**
+ * Destruye la sesión activa en el servidor y expira la cookie en el cliente.
+ * Usada por el logout y por la expiración por inactividad.
+ */
+function destroy_session(): void
+{
+    $_SESSION = [];
+
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_destroy();
+    }
+
+    setcookie(GCALLS_SESSION_NAME, '', [
+        'expires'  => time() - 3600,
+        'path'     => '/',
+        'domain'   => '',
+        'secure'   => is_https_request(),
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
 }
 
 /**
@@ -58,16 +97,11 @@ function check_auth(): ?array
         return null;
     }
 
-    // Timeout por inactividad: 2 horas (7200 segundos)
-    $idle_timeout = 7200;
     $now = time();
 
-    if (isset($_SESSION['last_activity']) && ($now - (int) $_SESSION['last_activity'] > $idle_timeout)) {
-        // Sesión expirada por inactividad
-        $_SESSION = [];
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            session_destroy();
-        }
+    if (isset($_SESSION['last_activity']) && ($now - (int) $_SESSION['last_activity'] > GCALLS_IDLE_TIMEOUT)) {
+        // Sesión expirada por inactividad: se destruye y se expira la cookie
+        destroy_session();
         return null;
     }
 
