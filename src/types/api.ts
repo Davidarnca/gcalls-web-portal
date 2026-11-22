@@ -84,3 +84,38 @@ export type AuthResponse = ApiResponse<AuthResponseData>;
 
 export type LogoutResponse = ApiResponse<never>;
 
+
+// ── CMS: contenidos editables (tabla `contenidos`) ────────────────────────────
+// Campos definidos en public/api/config/contenidos.php. Todos son texto; vacío = no mostrar.
+
+export type ContenidoSeccion = 'global';
+
+export interface ContenidoGlobal {
+  email: string;
+  telefono: string;
+  telefono_secundario: string;
+  /** Solo dígitos con indicativo de país, ej. 573201234567 */
+  whatsapp: string;
+  direccion: string;
+  ciudad: string;
+  /** Una línea por renglón del horario */
+  horario: string;
+  linkedin: string;
+  facebook: string;
+  instagram: string;
+}
+
+/** GET /api/contenidos.php — `datos` puede venir parcial o vacío si nunca se guardó */
+export interface ContenidoPublicoData<T> {
+  seccion: ContenidoSeccion;
+  datos: Partial<T>;
+  actualizado_en: string | null;
+}
+
+/** GET/PUT /api/admin/contenidos.php */
+export interface ContenidoAdminData<T> extends ContenidoPublicoData<T> {
+  actualizado_por: string | null;
+}
+
+export type ContenidoPublicoResponse<T> = ApiResponse<ContenidoPublicoData<T>>;
+export type ContenidoAdminResponse<T> = ApiResponse<ContenidoAdminData<T>>;

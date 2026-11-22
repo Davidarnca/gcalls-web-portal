@@ -2,9 +2,29 @@ import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Linkedin, Facebook, Instagram, Send, Clock } from "lucide-react";
 import footerLogo from "@/assets/footer-logo.png";
 import footerSeparator from "@/assets/favicon.png";
+import {
+  enlaceMapa,
+  enlaceTelefono,
+  lineas,
+  ubicacion,
+  useContenidoGlobal,
+} from "@/lib/contenidos";
+
+const iconoContacto =
+  "p-1.5 md:p-2 rounded-lg bg-blue-950/50 border border-blue-800/30 group-hover:border-primary/50 transition-colors flex-shrink-0";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const contacto = useContenidoGlobal();
+
+  const telefonos = [contacto.telefono, contacto.telefono_secundario].filter(Boolean);
+  const direccionCompleta = ubicacion(contacto);
+  const horario = lineas(contacto.horario);
+  const redes = [
+    { nombre: "LinkedIn", url: contacto.linkedin, Icono: Linkedin },
+    { nombre: "Facebook", url: contacto.facebook, Icono: Facebook },
+    { nombre: "Instagram", url: contacto.instagram, Icono: Instagram },
+  ].filter((red) => red.url);
 
   return (
     <footer className="bg-[hsl(220,45%,12%)] text-gray-100 border-t border-blue-900/30">
@@ -79,68 +99,73 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact Info */}
+          {/* Contact Info — editable desde el panel (Contenidos → Datos de contacto) */}
           <div>
             <h3 className="text-white font-bold mb-4 md:mb-6 text-sm md:text-base uppercase tracking-wider">Contacto</h3>
             <ul className="space-y-3 md:space-y-4">
-              <li>
-                <a href="mailto:info@gestionsostenible.com" className="group flex items-center gap-2 md:gap-3 text-gray-300 hover:text-white transition-colors">
-                  <div className="p-1.5 md:p-2 rounded-lg bg-blue-950/50 border border-blue-800/30 group-hover:border-primary/50 transition-colors flex-shrink-0">
-                    <Mail size={14} className="text-blue-400 md:w-4 md:h-4" />
+              {contacto.email && (
+                <li>
+                  <a href={`mailto:${contacto.email}`} className="group flex items-center gap-2 md:gap-3 text-gray-300 hover:text-white transition-colors">
+                    <div className={iconoContacto}>
+                      <Mail size={14} className="text-blue-400 md:w-4 md:h-4" />
+                    </div>
+                    <span className="text-sm md:text-base break-all">{contacto.email}</span>
+                  </a>
+                </li>
+              )}
+              {telefonos.map((telefono) => (
+                <li key={telefono}>
+                  <a href={enlaceTelefono(telefono)} className="group flex items-center gap-2 md:gap-3 text-gray-300 hover:text-white transition-colors">
+                    <div className={iconoContacto}>
+                      <Phone size={14} className="text-blue-400 md:w-4 md:h-4" />
+                    </div>
+                    <span className="text-sm md:text-base">{telefono}</span>
+                  </a>
+                </li>
+              ))}
+              {direccionCompleta && (
+                <li>
+                  <a href={enlaceMapa(direccionCompleta)} target="_blank" rel="noopener noreferrer" className="group flex items-center gap-2 md:gap-3 text-gray-300 hover:text-white transition-colors">
+                    <div className={iconoContacto}>
+                      <MapPin size={14} className="text-blue-400 md:w-4 md:h-4" />
+                    </div>
+                    <span className="text-sm md:text-base">{direccionCompleta}</span>
+                  </a>
+                </li>
+              )}
+              {horario.length > 0 && (
+                <li>
+                  <div className="flex items-start gap-2 md:gap-3 text-gray-300">
+                    <div className={iconoContacto}>
+                      <Clock size={14} className="text-blue-400 md:w-4 md:h-4" />
+                    </div>
+                    <span className="text-sm md:text-base">
+                      {horario.map((linea) => (
+                        <span key={linea} className="block">{linea}</span>
+                      ))}
+                    </span>
                   </div>
-                  <span className="text-sm md:text-base break-all">info@gestionsostenible.com</span>
-                </a>
-              </li>
-              <li>
-                <a href="tel:+15551234567" className="group flex items-center gap-2 md:gap-3 text-gray-300 hover:text-white transition-colors">
-                  <div className="p-1.5 md:p-2 rounded-lg bg-blue-950/50 border border-blue-800/30 group-hover:border-primary/50 transition-colors flex-shrink-0">
-                    <Phone size={14} className="text-blue-400 md:w-4 md:h-4" />
-                  </div>
-                  <span className="text-sm md:text-base">+1 (555) 123-4567</span>
-                </a>
-              </li>
-              <li>
-                <div className="flex items-center gap-2 md:gap-3 text-gray-300">
-                  <div className="p-1.5 md:p-2 rounded-lg bg-blue-950/50 border border-blue-800/30 flex-shrink-0">
-                    <MapPin size={14} className="text-blue-400 md:w-4 md:h-4" />
-                  </div>
-                  <span className="text-sm md:text-base">Ciudad, País</span>
-                </div>
-              </li>
-              <li>
-                <div className="flex items-center gap-2 md:gap-3 text-gray-300">
-                  <div className="p-1.5 md:p-2 rounded-lg bg-blue-950/50 border border-blue-800/30 flex-shrink-0">
-                    <Clock size={14} className="text-blue-400 md:w-4 md:h-4" />
-                  </div>
-                  <span className="text-sm md:text-base">Lunes a Viernes de 8 AM a 5 PM</span>
-                </div>
-              </li>
+                </li>
+              )}
             </ul>
 
-            {/* Social Media */}
-            <div className="mt-4 md:mt-6 flex gap-2">
-              <a
-                href="#"
-                className="p-2 md:p-2.5 rounded-lg bg-blue-950/50 border border-blue-800/30 hover:bg-primary hover:border-primary transition-all duration-300"
-                aria-label="LinkedIn"
-              >
-                <Linkedin size={16} className="text-blue-300 md:w-[18px] md:h-[18px]" />
-              </a>
-              <a
-                href="#"
-                className="p-2 md:p-2.5 rounded-lg bg-blue-950/50 border border-blue-800/30 hover:bg-primary hover:border-primary transition-all duration-300"
-                aria-label="Facebook"
-              >
-                <Facebook size={16} className="text-blue-300 md:w-[18px] md:h-[18px]" />
-              </a>
-              <a
-                href="#"
-                className="p-2 md:p-2.5 rounded-lg bg-blue-950/50 border border-blue-800/30 hover:bg-primary hover:border-primary transition-all duration-300"
-                aria-label="Instagram"
-              >
-                <Instagram size={16} className="text-blue-300 md:w-[18px] md:h-[18px]" />
-              </a>
-            </div>
+            {/* Social Media — solo se muestran las redes configuradas */}
+            {redes.length > 0 && (
+              <div className="mt-4 md:mt-6 flex gap-2">
+                {redes.map(({ nombre, url, Icono }) => (
+                  <a
+                    key={nombre}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 md:p-2.5 rounded-lg bg-blue-950/50 border border-blue-800/30 hover:bg-primary hover:border-primary transition-all duration-300"
+                    aria-label={nombre}
+                  >
+                    <Icono size={16} className="text-blue-300 md:w-[18px] md:h-[18px]" />
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

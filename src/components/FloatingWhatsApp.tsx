@@ -1,6 +1,12 @@
+import { enlaceWhatsapp, useContenidoGlobal } from "@/lib/contenidos";
+
 const FloatingWhatsApp = () => {
-  const phoneNumber = "573208693786";
-  const whatsappUrl = `https://wa.me/${phoneNumber}`;
+  const { whatsapp } = useContenidoGlobal();
+
+  // Sin número configurado en el panel, el botón no se muestra
+  if (!whatsapp) return null;
+
+  const whatsappUrl = enlaceWhatsapp(whatsapp);
 
   return (
     <a

@@ -6,6 +6,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 // Sonner es el sistema de notificaciones activo en el proyecto (ver App.tsx)
 import { toast } from "@/components/ui/sonner";
+import {
+  enlaceMapa,
+  enlaceTelefono,
+  lineas,
+  ubicacion,
+  useContenidoGlobal,
+} from "@/lib/contenidos";
 
 // URL del endpoint PHP — el proxy de Vite redirige /api → servidor PHP en dev
 const API_URL = "/api/contactos.php";
@@ -122,26 +129,36 @@ const Contactos = () => {
     }));
   };
 
+  // Datos de contacto editables desde el panel (Contenidos → Datos de contacto).
+  // Las tarjetas sin dato configurado no se muestran.
+  const contacto = useContenidoGlobal();
+  const direccionCompleta = ubicacion(contacto);
+  const telefonos = [contacto.telefono, contacto.telefono_secundario].filter(Boolean);
+  const horario = lineas(contacto.horario);
+
   const contactInfo = [
-    {
+    contacto.email && {
       icon: Mail,
       title: "Correo Electrónico",
-      value: "info@gestionsostenible.com",
-      link: "mailto:info@gestionsostenible.com",
+      values: [contacto.email],
+      link: `mailto:${contacto.email}`,
+      external: false,
     },
-    {
+    telefonos.length > 0 && {
       icon: Phone,
-      title: "Teléfono",
-      value: "+1 (555) 123-4567",
-      link: "tel:+15551234567",
+      title: telefonos.length > 1 ? "Teléfonos" : "Teléfono",
+      values: telefonos,
+      link: enlaceTelefono(telefonos[0]),
+      external: false,
     },
-    {
+    direccionCompleta && {
       icon: MapPin,
       title: "Dirección",
-      value: "Ciudad, País",
-      link: "#",
+      values: [direccionCompleta],
+      link: enlaceMapa(direccionCompleta),
+      external: true,
     },
-  ];
+  ].filter((item): item is Exclude<typeof item, false | ""> => Boolean(item));
 
   return (
     <>
@@ -181,6 +198,7 @@ const Contactos = () => {
                       >
                         <a
                           href={info.link}
+                          {...(info.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                           className="flex items-start gap-4 group"
                         >
                           <div className="w-12 h-12 rounded-lg gradient-primary flex items-center justify-center flex-shrink-0 group-hover:animate-float">
@@ -193,9 +211,11 @@ const Contactos = () => {
                             <h3 className="font-semibold mb-1 group-hover:text-primary transition-colors">
                               {info.title}
                             </h3>
-                            <p className="text-muted-foreground">
-                              {info.value}
-                            </p>
+                            {info.values.map((valor) => (
+                              <p key={valor} className="text-muted-foreground break-words">
+                                {valor}
+                              </p>
+                            ))}
                           </div>
                         </a>
                       </Card>
@@ -204,16 +224,18 @@ const Contactos = () => {
                 </div>
               </div>
 
-              <Card className="p-6 gradient-secondary text-white">
-                <h3 className="text-xl font-semibold mb-3">
-                  Horario de Atención
-                </h3>
-                <div className="space-y-2 text-white/90">
-                  <p>Lunes a Viernes: 8:00 AM - 6:00 PM</p>
-                  <p>Sábados: 9:00 AM - 1:00 PM</p>
-                  <p>Domingos: Cerrado</p>
-                </div>
-              </Card>
+              {horario.length > 0 && (
+                <Card className="p-6 gradient-secondary text-white">
+                  <h3 className="text-xl font-semibold mb-3">
+                    Horario de Atención
+                  </h3>
+                  <div className="space-y-2 text-white/90">
+                    {horario.map((linea) => (
+                      <p key={linea}>{linea}</p>
+                    ))}
+                  </div>
+                </Card>
+              )}
             </div>
 
             {/* Contact Form */}
