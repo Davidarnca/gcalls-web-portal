@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, Briefcase, FileText } from "lucide-react";
+import { LayoutDashboard, Users, PenSquare, Briefcase, FileText } from "lucide-react";
 
 interface NavItem {
   name: string;
@@ -14,6 +14,7 @@ const AdminSidebar: React.FC = () => {
   const navItems: NavItem[] = [
     { name: "Dashboard", icon: LayoutDashboard, to: "/admin", end: true },
     { name: "Contactos", icon: Users, to: "/admin/contactos" },
+    { name: "Contenidos", icon: PenSquare, to: "/admin/contenidos" },
     { name: "Servicios", icon: Briefcase, disabled: true },
     { name: "Cotizaciones", icon: FileText, disabled: true },
   ];

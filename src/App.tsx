@@ -29,6 +29,7 @@ import AdminLayout from "./components/admin/AdminLayout";
 import Login from "./pages/admin/Login";
 import Dashboard from "./pages/admin/Dashboard";
 import AdminContactos from "./pages/admin/Contactos";
+import AdminContenidos from "./pages/admin/Contenidos";
 
 // Evaluación segura del flag de mantenimiento con fallback defensivo
 // Si rawMaintenanceEnv no está definido o es "true", se considera en mantenimiento.
@@ -59,6 +60,7 @@ const App = () => {
                 <Route path="/admin" element={<AdminLayout />}>
                   <Route index element={<Dashboard />} />
                   <Route path="contactos" element={<AdminContactos />} />
+                  <Route path="contenidos" element={<AdminContenidos />} />
                 </Route>
               </Route>
 
