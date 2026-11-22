@@ -1,5 +1,6 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import type { Lead, LeadsListResponse } from "@/types/api";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Table,
   TableBody,
@@ -104,44 +105,70 @@ const getEstadoLabel = (estado: Lead["estado"]): string => {
 };
 
 const AdminContactos: React.FC = () => {
+  const { checkSession } = useAuth();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchLeads = async () => {
+  const fetchLeads = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
       let data: LeadsListResponse;
 
-      if (import.meta.env.DEV) {
-        // En desarrollo, consumimos la capa de Mock dinámica
+      // El comportamiento predeterminado es consumir la API real de MySQL.
+      // El modo Mock solo se activa explícitamente mediante VITE_USE_MOCK_LEADS="true".
+      const useMock = import.meta.env.VITE_USE_MOCK_LEADS === "true";
+
+      if (useMock) {
+        // En desarrollo con flag explícito, consumimos la capa de Mock dinámica
         const { mockGetLeads } = await import("@/lib/api/admin-contactos.mock");
         data = await mockGetLeads();
       } else {
-        // En producción, consulta real al endpoint PHP
+        // Consulta real al endpoint PHP con cookie de sesión incluida
         const response = await fetch("/api/admin/contactos.php", {
           method: "GET",
           headers: {
             Accept: "application/json",
           },
+          credentials: "include",
         });
 
-        // a) HTTP != 2xx
+        // a) 401 Unauthorized: sesión ausente o expirada.
+        // Se revalida la sesión en el contexto; al quedar sin sesión,
+        // ProtectedRoute redirige automáticamente a /admin/login.
+        if (response.status === 401) {
+          toast.error("Tu sesión expiró", {
+            description: "Inicia sesión nuevamente para continuar.",
+          });
+          await checkSession();
+          return;
+        }
+
+        // b) 403 Forbidden: Sin rol administrativo suficiente
+        if (response.status === 403) {
+          throw new Error("Acceso denegado. No dispones de permisos suficientes para ver los contactos.");
+        }
+
+        // c) Otros HTTP != 2xx
         if (!response.ok) {
           throw new Error(`Error en el servidor (${response.status})`);
         }
 
-        data = await response.json();
+        try {
+          data = await response.json();
+        } catch {
+          throw new Error("Respuesta no válida del servidor.");
+        }
       }
 
-      // b) response.success === false
+      // d) response.success === false
       if (data.success === false) {
         throw new Error(data.message || "La solicitud no fue exitosa");
       }
 
-      // c) response.data?.leads no existe o no es un arreglo
+      // e) response.data?.leads no existe o no es un arreglo
       if (!data.data || !Array.isArray(data.data.leads)) {
         throw new Error("Formato de datos inválido recibido del servidor");
       }
@@ -156,11 +183,11 @@ const AdminContactos: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [checkSession]);
 
   useEffect(() => {
     fetchLeads();
-  }, []);
+  }, [fetchLeads]);
 
   return (
     <div className="p-4 md:p-8 space-y-6 max-w-7xl mx-auto">

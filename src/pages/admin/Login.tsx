@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2, Lock, Mail } from "lucide-react";
@@ -24,8 +24,9 @@ const Login = () => {
     try {
       await login(email, password);
       navigate("/admin");
-    } catch (err: any) {
-      setError(err.message || "Error al iniciar sesión");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Error al iniciar sesión";
+      setError(message);
     } finally {
       setLoading(false);
     }

@@ -19,28 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     json_response(false, 'Método no permitido. Usa POST.', httpCode: 405);
 }
 
-start_secure_session();
-
-// 1. Limpiar variables de sesión
-$_SESSION = [];
-
-// 2. Destruir sesión en servidor si está activa
-if (session_status() === PHP_SESSION_ACTIVE) {
-    session_destroy();
+// 1. Validar token CSRF antes de modificar o destruir la sesión activa
+// validate_csrf_token() inicializa internamente la sesión segura de forma idempotente
+if (!validate_csrf_token()) {
+    json_response(false, 'Token CSRF inválido o ausente.', httpCode: 403);
 }
 
-// 3. Expirar la cookie en el cliente
-$is_https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-    || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443)
-    || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
-
-setcookie('GCALLS_SESSID', '', [
-    'expires'  => time() - 3600,
-    'path'     => '/',
-    'domain'   => '',
-    'secure'   => $is_https,
-    'httponly' => true,
-    'samesite' => 'Lax',
-]);
+// 2. Limpiar variables, destruir la sesión en el servidor y expirar la cookie
+destroy_session();
 
 json_response(true, 'Sesión cerrada correctamente.', httpCode: 200);

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * G-Calls S.A.S. — Mock DEV: GET /api/admin/contactos
  *
  * Simula la respuesta del endpoint administrativo de lectura de leads.

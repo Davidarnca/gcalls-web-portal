@@ -1,4 +1,4 @@
-﻿/**
+/**
  * G-Calls S.A.S. — Tipos centralizados de la API REST
  *
  * Centraliza los contratos de datos compartidos entre el frontend
@@ -60,3 +60,27 @@ export interface LeadsListResponse {
     total: number;   // número de registros devueltos (= leads.length en v1)
   };
 }
+
+// ── Tipos de Autenticación y Sesiones Administrativas ────────────────────────
+// Reflejan exactamente los contratos devueltos por:
+// - POST /api/auth/login.php
+// - GET  /api/auth/me.php
+// - POST /api/auth/logout.php
+export type UserRol = 'admin' | 'editor' | 'viewer';
+
+export interface AuthUser {
+  id: number;
+  nombre: string;
+  email: string;
+  rol: UserRol;
+}
+
+export interface AuthResponseData {
+  user: AuthUser;
+  csrf_token: string;
+}
+
+export type AuthResponse = ApiResponse<AuthResponseData>;
+
+export type LogoutResponse = ApiResponse<never>;
+
