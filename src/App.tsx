@@ -13,12 +13,6 @@ import NuestrosMercados from "./pages/NuestrosMercados";
 import QueGestionamos from "./pages/QueGestionamos";
 import Contactos from "./pages/Contactos";
 import NotFound from "./pages/NotFound";
-import SupplyChain from "./pages/servicios/SupplyChain";
-import GestionAmbientalEsg from "./pages/servicios/GestionAmbientalEsg";
-import TalentoHumano from "./pages/servicios/TalentoHumano";
-import GestionSocial from "./pages/servicios/GestionSocial";
-import AsesoriaLegal from "./pages/servicios/AsesoriaLegal";
-import Sst from "./pages/servicios/Sst";
 
 import Mantenimiento from "./components/Mantenimiento";
 
@@ -30,6 +24,7 @@ import Login from "./pages/admin/Login";
 import Dashboard from "./pages/admin/Dashboard";
 import AdminContactos from "./pages/admin/Contactos";
 import AdminContenidos from "./pages/admin/Contenidos";
+import ServicioDetalle from "./pages/ServicioDetalle";
 
 // Evaluación segura del flag de mantenimiento con fallback defensivo
 // Si rawMaintenanceEnv no está definido o es "true", se considera en mantenimiento.
@@ -82,12 +77,7 @@ const App = () => {
                 <Route path="/nuestro-equipo" element={<NuestroEquipo />} />
                 <Route path="/nuestros-mercados" element={<NuestrosMercados />} />
                 <Route path="/que-gestionamos" element={<QueGestionamos />} />
-                <Route path="/servicios/supply-chain-management" element={<SupplyChain />} />
-                <Route path="/servicios/gestion-ambiental-sostenibilidad" element={<GestionAmbientalEsg />} />
-                <Route path="/servicios/seguridad-salud-trabajo" element={<Sst />} />
-                <Route path="/servicios/gestion-talento-humano" element={<TalentoHumano />} />
-                <Route path="/servicios/gestion-social-rse" element={<GestionSocial />} />
-                <Route path="/servicios/asesoria-legal" element={<AsesoriaLegal />} />
+                <Route path="/servicios/:slug" element={<ServicioDetalle />} />
                 <Route path="/contactos" element={<Contactos />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
