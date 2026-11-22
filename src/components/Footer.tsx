@@ -9,6 +9,7 @@ import {
   ubicacion,
   useContenidoGlobal,
 } from "@/lib/contenidos";
+import { rutaServicio, useServicios } from "@/lib/servicios";
 
 const iconoContacto =
   "p-1.5 md:p-2 rounded-lg bg-blue-950/50 border border-blue-800/30 group-hover:border-primary/50 transition-colors flex-shrink-0";
@@ -16,6 +17,7 @@ const iconoContacto =
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const contacto = useContenidoGlobal();
+  const { servicios } = useServicios();
 
   const telefonos = [contacto.telefono, contacto.telefono_secundario].filter(Boolean);
   const direccionCompleta = ubicacion(contacto);
@@ -91,11 +93,16 @@ const Footer = () => {
           <div>
             <h3 className="text-white font-bold mb-4 md:mb-6 text-sm md:text-base uppercase tracking-wider">Servicios</h3>
             <ul className="space-y-2 md:space-y-3 text-sm md:text-base">
-              <li className="text-gray-300 hover:text-white transition-colors cursor-pointer">Supply Chain</li>
-              <li className="text-gray-300 hover:text-white transition-colors cursor-pointer">Medio Ambiente</li>
-              <li className="text-gray-300 hover:text-white transition-colors cursor-pointer">Seguridad Industrial</li>
-              <li className="text-gray-300 hover:text-white transition-colors cursor-pointer">Salud Laboral</li>
-              <li className="text-gray-300 hover:text-white transition-colors cursor-pointer">RSE</li>
+              {servicios.map((servicio) => (
+                <li key={servicio.slug}>
+                  <Link
+                    to={rutaServicio(servicio.slug)}
+                    className="text-gray-300 hover:text-white hover:translate-x-1 inline-block transition-all duration-200"
+                  >
+                    {servicio.titulo}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 

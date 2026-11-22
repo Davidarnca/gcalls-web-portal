@@ -44,7 +44,7 @@ const Index = () => {
       icon: Leaf,
       title: "Gestión Ambiental; Seguridad Industrial y Salud Ocupacional",
       description: "Consultoría estratégica en servicios ambientales, seguridad industrial y salud ocupacional con soluciones completas y ejecutables.",
-      path: "/servicios/gestion-ambiental-seguridad-salud",
+      path: "/servicios/gestion-ambiental-sostenibilidad",
     },
     {
       icon: Users,
