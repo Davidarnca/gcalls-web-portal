@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 // --- Verificación obligatoria de autenticación y rol ------------------------
-// Sesión válida -> HTTP 401
+// Sin sesión válida -> HTTP 401
 // Sesión válida pero rol no autorizado (ej. viewer) -> HTTP 403
 require_auth(['admin', 'editor']);
 

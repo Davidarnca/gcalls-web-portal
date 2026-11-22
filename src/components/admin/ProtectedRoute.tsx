@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -6,7 +6,7 @@ const ProtectedRoute: React.FC = () => {
   const { isAuthenticated, isInitializing } = useAuth();
 
   if (isInitializing) {
-    return null; // Esperar a que se resuelva la sesiÃ³n antes de tomar decisiones
+    return null; // Esperar a que se resuelva la sesión antes de tomar decisiones
   }
 
   if (!isAuthenticated) {

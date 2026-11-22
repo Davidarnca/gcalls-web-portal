@@ -1,4 +1,4 @@
-﻿import { ContactoPayload, ApiResponse } from "@/pages/Contactos";
+import { ContactoPayload, ApiResponse } from "@/pages/Contactos";
 
 export interface MockFetchResponse {
   status: number;
