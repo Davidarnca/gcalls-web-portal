@@ -23,12 +23,11 @@ declare(strict_types=1);
 // Agrega aqui los dominios de produccion y staging de G-Calls.
 // Formato: 'https://dominio.com'  (sin barra final)
 $allowed_origins = [
-    'http://localhost:8080',   // Vite dev server (puerto configurado en vite.config.ts)
-    'http://localhost:5173',   // Vite dev server alternativo
-    'http://localhost:3000',   // Node server local
-    'http://localhost:4173',   // Vite preview
-    'https://gcalls.com.co',   // Produccion
-    'https://www.gcalls.com.co',
+    'http://localhost:8080',      // Vite dev server (puerto configurado en vite.config.ts)
+    'http://localhost:5173',      // Vite dev server alternativo
+    'http://localhost:4173',      // Vite preview
+    'https://gcallssas.com',      // Produccion
+    'https://www.gcallssas.com',
 ];
 
 // --- Validacion del origen de la solicitud --- //
@@ -45,7 +44,7 @@ if (in_array($request_origin, $allowed_origins, strict: true)) {
 }
 
 // --- Cabeceras de control CORS --- //
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Methods: GET, POST, PATCH, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-CSRF-Token');
 header('Access-Control-Max-Age: 86400');            // Cache del preflight por 24 horas
 header('Access-Control-Allow-Credentials: true');   // Permite envio de cookies / credenciales
