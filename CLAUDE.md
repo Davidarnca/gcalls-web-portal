@@ -22,6 +22,8 @@ para la etapa Automation 2.0 y no se tocan en este ciclo.
   Tablas: `usuarios` (sin columna `activo`), `servicios` (slug, contenido_json, activo),
   `contactos_leads`, `cotizaciones` (sin uso aún; FK a leads con `ON DELETE CASCADE`, pendiente de
   cambiar a RESTRICT antes de H2/H3), `contenidos` (CMS, una fila por sección).
+  En `servicios`: `color_accent` guarda la **clave del tema** (no un HEX), `icono` un nombre de la lista
+  permitida y `contenido_json` `{ descripcion, tarjetas: [{ titulo, icono, items[] }] }`.
 - **Producción:** Colombia Hosting (cPanel), dominio `gcallssas.com` <!-- verificar vigencia del plan -->.
   `.env` se lee desde `dirname(public/api/config, 3)`: en el hosting queda **fuera** de `public_html`.
 
@@ -52,12 +54,16 @@ descargas. No volver a conectarlo. El backend Node/Express de correo también se
 src/
   types/api.ts                 # Fuente única de verdad de contratos (Lead, ApiResponse, Contenido*...)
   lib/contenidos.ts            # CMS: valores de respaldo, useContenidoGlobal(), utilidades de enlaces
+  lib/servicios.ts             # Servicios: temas de color, contenido de respaldo, useServicios()
+  lib/iconos.ts                # Íconos permitidos (= SERVICIOS_ICONOS en PHP)
+  lib/api/admin-servicios.ts   # Cliente de /api/admin/servicios.php
   lib/api/*.mock.ts            # Mocks DEV (import dinámico)
   contexts/AuthContext.tsx     # Sesión real contra /api/auth/*; usuario y csrfToken en memoria
   components/admin/            # AdminLayout, AdminSidebar, AdminNavbar, ProtectedRoute
   components/Mantenimiento.tsx # Pantalla de mantenimiento
   pages/                       # Páginas públicas
-  pages/admin/                 # Login, Dashboard, Contactos (leads), Contenidos (CMS)
+  pages/ServicioDetalle.tsx    # Plantilla única de /servicios/:slug (inactivo o inexistente → 404)
+  pages/admin/                 # Login, Dashboard, Contactos (leads), Contenidos, Servicios, ServicioEditar
 public/api/
   config/env.php               # Carga .env
   config/db.php                # get_db_connection() singleton
@@ -65,11 +71,14 @@ public/api/
   config/auth.php              # start_secure_session, check_auth, require_auth, validate_csrf_token, destroy_session
   config/cors.php              # Lista blanca de orígenes + X-CSRF-Token
   config/contenidos.php        # CMS: esquema de secciones, validar_contenido(), obtener_contenido()
+  config/servicios.php         # Íconos y temas permitidos, validar_servicio_patch(), servicio_desde_fila()
   auth/{login,logout,me}.php
   contactos.php                # POST público del formulario
   contenidos.php               # GET público ?seccion=
-  admin/contactos.php          # GET leads (admin, editor), LIMIT 200
+  servicios.php                # GET público: servicios activos
+  admin/contactos.php          # GET leads con servicio_titulo (admin, editor), LIMIT 200
   admin/contenidos.php         # GET (admin, editor, viewer) / PUT con CSRF (admin, editor) ?seccion=
+  admin/servicios.php          # GET todos / PATCH ?id= parcial con CSRF (activo, titulo, icono, tema, contenido)
 migrations/                    # Cambios de esquema posteriores a schema.sql
 scripts/create_admin.php       # CLI, contraseña oculta. NO ejecutar sin autorización
 scripts/seed_servicios.php     # Idempotente. NO ejecutar sin autorización
@@ -91,6 +100,12 @@ Patrón: **campos controlados + listas editables**. Nada de editor de bloques li
 4. **Sitio:** el componente lee con un hook de `src/lib/contenidos.ts` (react-query, clave `["contenido", seccion]`).
 5. **Panel:** formulario con react-hook-form + zod que refleja las reglas del servidor (el servidor decide);
    al guardar, invalidar la clave de react-query. Roles: viewer solo lectura.
+
+**Servicios:** el diseño no es libre. El panel elige ícono y tema de listas cerradas que deben ser
+**idénticas** en `public/api/config/servicios.php` y en `src/lib/iconos.ts` / `src/lib/servicios.ts`.
+Los temas usan clases Tailwind escritas completas (no construirlas con interpolación).
+Si un servicio no tiene ícono, tema o contenido válidos guardados, se usa su respaldo (contenido original).
+Los slugs no se editan desde el panel (son las URLs). Crear servicios nuevos aún no está soportado.
 
 ## Comandos de verificación
 
@@ -154,7 +169,7 @@ Pruebas HTTP con `curl.exe` (no el alias `curl` de PowerShell) contra `http://lo
 | Hito | Contenido | Estado |
 |---|---|---|
 | H0 Línea base | Auth real, CSRF, sesiones, CORS, codificación, retiro de legado (PR #1, `47bb001`, 22/11) | ✅ Cerrado |
-| H1a CMS esencial | PR #2 contenidos globales (contacto, horario, redes, WhatsApp) · PR #3 servicios (plantilla única con `contenido_json`, activar/desactivar, selector en formulario) · PR #4 Inicio (banner y tarjetas) · PR #5 imágenes | En curso: PR #2 |
+| H1a CMS esencial | PR #2 contenidos globales (contacto, horario, redes, WhatsApp) · PR #3 servicios (plantilla única, edición, publicar/ocultar, selector en formulario) · PR #4 Inicio (banner y tarjetas) · PR #5 imágenes | En revisión: PR #2 y PR #3 |
 | H1b CMS resto | Quiénes Somos, Nuestro Equipo, Decálogo, Mercados, Qué Gestionamos | Pendiente |
 | H2 CRM de leads | CRUD, estados, responsables, notas, próximas acciones, historial, borrado solo admin | Pendiente |
 | H3 Cotizaciones/PDF | Cotizaciones ligadas a leads, conceptos, cálculos, estados, PDF corporativo | Pendiente |
@@ -169,6 +184,7 @@ Pendientes menores detectados:
 - Placeholder del login muestra el correo real del admin.
 - Barra lateral del panel oculta en móvil (`hidden md:flex`): sin navegación en pantallas pequeñas.
 - Etiqueta "PRÓXIMAMENTE" desbordada en la barra lateral; Dashboard con un segundo botón "Cerrar sesión".
-- Footer: lista de servicios fija y formulario de newsletter sin funcionalidad.
-- Leads: nombre del servicio en lugar de `Servicio #ID` (M-04), paginación/filtros (M-03),
-  consulta redundante de `fecha_registro` tras INSERT (M-01).
+- Footer: formulario de newsletter sin funcionalidad.
+- Tarjetas de servicios en Inicio y en "¿Qué Gestionamos?" siguen fijas en el código (PR #4 / H1b).
+- La página de servicio tipo marca usa una imagen de Unsplash enlazada externamente (conviene alojarla).
+- Leads: paginación/filtros (M-03), consulta redundante de `fecha_registro` tras INSERT (M-01).
