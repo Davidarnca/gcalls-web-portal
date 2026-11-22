@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import type { Lead, LeadsListResponse } from "@/types/api";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Table,
   TableBody,
@@ -104,11 +105,12 @@ const getEstadoLabel = (estado: Lead["estado"]): string => {
 };
 
 const AdminContactos: React.FC = () => {
+  const { checkSession } = useAuth();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchLeads = async () => {
+  const fetchLeads = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -133,9 +135,15 @@ const AdminContactos: React.FC = () => {
           credentials: "include",
         });
 
-        // a) 401 Unauthorized: Sesión ausente o expirada
+        // a) 401 Unauthorized: sesión ausente o expirada.
+        // Se revalida la sesión en el contexto; al quedar sin sesión,
+        // ProtectedRoute redirige automáticamente a /admin/login.
         if (response.status === 401) {
-          throw new Error("No autenticado. Tu sesión ha expirado o es inválida.");
+          toast.error("Tu sesión expiró", {
+            description: "Inicia sesión nuevamente para continuar.",
+          });
+          await checkSession();
+          return;
         }
 
         // b) 403 Forbidden: Sin rol administrativo suficiente
@@ -175,11 +183,11 @@ const AdminContactos: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [checkSession]);
 
   useEffect(() => {
     fetchLeads();
-  }, []);
+  }, [fetchLeads]);
 
   return (
     <div className="p-4 md:p-8 space-y-6 max-w-7xl mx-auto">
