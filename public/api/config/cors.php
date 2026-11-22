@@ -44,7 +44,7 @@ if (in_array($request_origin, $allowed_origins, strict: true)) {
 }
 
 // --- Cabeceras de control CORS --- //
-header('Access-Control-Allow-Methods: GET, POST, PATCH, DELETE, OPTIONS');
+header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-CSRF-Token');
 header('Access-Control-Max-Age: 86400');            // Cache del preflight por 24 horas
 header('Access-Control-Allow-Credentials: true');   // Permite envio de cookies / credenciales
