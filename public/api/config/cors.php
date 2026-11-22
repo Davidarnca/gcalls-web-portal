@@ -1,6 +1,6 @@
 <?php
 /**
- * G-Calls S.A.S. â€” Cabeceras CORS
+ * G-Calls S.A.S. - Cabeceras CORS
  *
  * Centraliza la politica de Cross-Origin Resource Sharing.
  * Incluye este archivo al inicio de cada endpoint de la API.
@@ -19,7 +19,7 @@
 
 declare(strict_types=1);
 
-// â”€â”€ Origenes permitidos â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Origenes permitidos --- //
 // Agrega aqui los dominios de produccion y staging de G-Calls.
 // Formato: 'https://dominio.com'  (sin barra final)
 $allowed_origins = [
@@ -31,7 +31,7 @@ $allowed_origins = [
     'https://www.gcalls.com.co',
 ];
 
-// â”€â”€ Validacion del origen de la solicitud â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Validacion del origen de la solicitud --- //
 $request_origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
 if (in_array($request_origin, $allowed_origins, strict: true)) {
@@ -44,17 +44,17 @@ if (in_array($request_origin, $allowed_origins, strict: true)) {
     // (Para APIs completamente publicas, sustituye por header('Access-Control-Allow-Origin: *'))
 }
 
-// â”€â”€ Cabeceras de control CORS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Cabeceras de control CORS --- //
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-CSRF-Token');
 header('Access-Control-Max-Age: 86400');            // Cache del preflight por 24 horas
 header('Access-Control-Allow-Credentials: true');   // Permite envio de cookies / credenciales
 
-// â”€â”€ Tipo de contenido por defecto â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Tipo de contenido por defecto --- //
 // Todos los endpoints de esta API responden JSON
 header('Content-Type: application/json; charset=UTF-8');
 
-// â”€â”€ Manejo de solicitudes preflight (OPTIONS) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Manejo de solicitudes preflight (OPTIONS) --- //
 // El navegador envia OPTIONS antes de una solicitud real (POST, PUT, etc.)
 // Respondemos inmediatamente con 204 y terminamos la ejecucion.
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {

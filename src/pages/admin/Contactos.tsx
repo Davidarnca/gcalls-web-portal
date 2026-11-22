@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { Lead, LeadsListResponse } from "@/types/api";
 import {
   Table,
@@ -115,33 +115,52 @@ const AdminContactos: React.FC = () => {
     try {
       let data: LeadsListResponse;
 
-      if (import.meta.env.DEV) {
-        // En desarrollo, consumimos la capa de Mock dinámica
+      // El comportamiento predeterminado es consumir la API real de MySQL.
+      // El modo Mock solo se activa explícitamente mediante VITE_USE_MOCK_LEADS="true".
+      const useMock = import.meta.env.VITE_USE_MOCK_LEADS === "true";
+
+      if (useMock) {
+        // En desarrollo con flag explícito, consumimos la capa de Mock dinámica
         const { mockGetLeads } = await import("@/lib/api/admin-contactos.mock");
         data = await mockGetLeads();
       } else {
-        // En producción, consulta real al endpoint PHP
+        // Consulta real al endpoint PHP con cookie de sesión incluida
         const response = await fetch("/api/admin/contactos.php", {
           method: "GET",
           headers: {
             Accept: "application/json",
           },
+          credentials: "include",
         });
 
-        // a) HTTP != 2xx
+        // a) 401 Unauthorized: Sesión ausente o expirada
+        if (response.status === 401) {
+          throw new Error("No autenticado. Tu sesión ha expirado o es inválida.");
+        }
+
+        // b) 403 Forbidden: Sin rol administrativo suficiente
+        if (response.status === 403) {
+          throw new Error("Acceso denegado. No dispones de permisos suficientes para ver los contactos.");
+        }
+
+        // c) Otros HTTP != 2xx
         if (!response.ok) {
           throw new Error(`Error en el servidor (${response.status})`);
         }
 
-        data = await response.json();
+        try {
+          data = await response.json();
+        } catch {
+          throw new Error("Respuesta no válida del servidor.");
+        }
       }
 
-      // b) response.success === false
+      // d) response.success === false
       if (data.success === false) {
         throw new Error(data.message || "La solicitud no fue exitosa");
       }
 
-      // c) response.data?.leads no existe o no es un arreglo
+      // e) response.data?.leads no existe o no es un arreglo
       if (!data.data || !Array.isArray(data.data.leads)) {
         throw new Error("Formato de datos inválido recibido del servidor");
       }
