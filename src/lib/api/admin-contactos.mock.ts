@@ -31,6 +31,7 @@ const MOCK_LEADS: Lead[] = [
     email: "carlos.mendez@logandina.co",
     telefono: "+57 310 234 5678",
     servicio_interes: 1,
+    servicio_titulo: "Cadena de Abastecimiento Inteligente",
     mensaje: "Necesitamos optimizar nuestra cadena de suministro para Q1 2027.",
     estado: "nuevo",
     fecha_registro: "2026-09-27 09:15:00",
@@ -42,6 +43,7 @@ const MOCK_LEADS: Lead[] = [
     email: "ana.torres@gmail.com",
     telefono: null,         // teléfono ausente → null
     servicio_interes: null, // sin servicio seleccionado → null
+    servicio_titulo: null,
     mensaje: "Me gustaría conocer sus servicios de gestión ambiental.",
     estado: "en_seguimiento",
     fecha_registro: "2026-09-25 14:30:00",
@@ -53,6 +55,7 @@ const MOCK_LEADS: Lead[] = [
     email: "pgutierrez@constructorabogota.com",
     telefono: "+57 300 987 6543",
     servicio_interes: 3,
+    servicio_titulo: "Seguridad y Salud en el Trabajo (SST)",
     mensaje: "Requerimos asesoría en SST para obra nueva de 8 pisos.",
     estado: "cotizado",
     fecha_registro: "2026-09-20 11:00:00",
@@ -64,6 +67,7 @@ const MOCK_LEADS: Lead[] = [
     email: "lrios@hrcg.co",
     telefono: "+57 320 111 2233",
     servicio_interes: 4,
+    servicio_titulo: "Gestión del Talento y Relaciones Laborales",
     mensaje: "Interés en gestión de talento humano para empresa de 200 empleados.",
     estado: "ganado",
     fecha_registro: "2026-09-15 08:45:00",
@@ -75,6 +79,7 @@ const MOCK_LEADS: Lead[] = [
     email: "j.ospina@expac.co",
     telefono: null,         // teléfono ausente → null
     servicio_interes: 2,
+    servicio_titulo: "Gestión Ambiental y Sostenibilidad (ESG)",
     mensaje: null,          // mensaje ausente → null
     estado: "perdido",
     fecha_registro: "2026-09-05 16:20:00",
@@ -86,6 +91,7 @@ const MOCK_LEADS: Lead[] = [
     email: "spam@noreply.com",
     telefono: null,
     servicio_interes: null,
+    servicio_titulo: null,
     mensaje: "Buy cheap watches!! Click here!!!",
     estado: "spam",
     fecha_registro: "2026-08-10 03:12:00",

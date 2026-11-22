@@ -357,7 +357,7 @@ const AdminContactos: React.FC = () => {
                     <TableCell className="align-top py-3.5 text-sm">
                       {lead.servicio_interes !== null ? (
                         <Badge variant="outline" className="font-normal text-xs bg-slate-50 text-slate-700 border-slate-200">
-                          Servicio #{lead.servicio_interes}
+                          {lead.servicio_titulo ?? `Servicio #${lead.servicio_interes}`}
                         </Badge>
                       ) : (
                         <span className="text-muted-foreground italic text-xs">

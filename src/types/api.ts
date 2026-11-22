@@ -46,6 +46,7 @@ export interface Lead {
   email: string;                    // VARCHAR(180) NOT NULL
   telefono: string | null;          // VARCHAR(30) DEFAULT NULL
   servicio_interes: number | null;  // INT UNSIGNED DEFAULT NULL (FK)
+  servicio_titulo: string | null;   // título del servicio (LEFT JOIN); null si no hay servicio
   mensaje: string | null;           // TEXT DEFAULT NULL
   estado: LeadEstado;               // ENUM NOT NULL DEFAULT 'nuevo'
   fecha_registro: string;           // DATETIME → 'YYYY-MM-DD HH:MM:SS'
@@ -119,3 +120,48 @@ export interface ContenidoAdminData<T> extends ContenidoPublicoData<T> {
 
 export type ContenidoPublicoResponse<T> = ApiResponse<ContenidoPublicoData<T>>;
 export type ContenidoAdminResponse<T> = ApiResponse<ContenidoAdminData<T>>;
+
+// ── Catálogo de servicios (tabla `servicios`) ─────────────────────────────────
+// Listas permitidas en public/api/config/servicios.php (iguales en src/lib/iconos.ts y src/lib/servicios.ts)
+
+export type ServicioTema = 'marca' | 'esmeralda' | 'naranja' | 'cian' | 'violeta' | 'azul';
+
+export interface ServicioTarjeta {
+  titulo: string;
+  /** Nombre de ícono de la lista permitida */
+  icono: string;
+  items: string[];
+}
+
+export interface ServicioContenido {
+  descripcion: string;
+  tarjetas: ServicioTarjeta[];
+}
+
+/** Servicio tal como lo entrega la API. null = usar respaldo del frontend. */
+export interface ServicioApi {
+  id: number;
+  slug: string;
+  titulo: string;
+  icono: string | null;
+  tema: ServicioTema | null;
+  contenido: ServicioContenido | null;
+}
+
+/** En el panel también llega el estado de publicación */
+export interface ServicioAdminApi extends ServicioApi {
+  activo: boolean;
+}
+
+export type ServiciosPublicoResponse = ApiResponse<{ servicios: ServicioApi[] }>;
+export type ServiciosAdminResponse = ApiResponse<{ servicios: ServicioAdminApi[] }>;
+export type ServicioAdminResponse = ApiResponse<{ servicio: ServicioAdminApi }>;
+
+/** PATCH /api/admin/servicios.php?id= */
+export type ServicioPatch = Partial<{
+  activo: boolean;
+  titulo: string;
+  icono: string;
+  tema: ServicioTema;
+  contenido: ServicioContenido;
+}>;
