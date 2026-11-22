@@ -24,6 +24,8 @@ import Login from "./pages/admin/Login";
 import Dashboard from "./pages/admin/Dashboard";
 import AdminContactos from "./pages/admin/Contactos";
 import AdminContenidos from "./pages/admin/Contenidos";
+import AdminServicios from "./pages/admin/Servicios";
+import AdminServicioEditar from "./pages/admin/ServicioEditar";
 import ServicioDetalle from "./pages/ServicioDetalle";
 
 // Evaluación segura del flag de mantenimiento con fallback defensivo
@@ -56,6 +58,8 @@ const App = () => {
                   <Route index element={<Dashboard />} />
                   <Route path="contactos" element={<AdminContactos />} />
                   <Route path="contenidos" element={<AdminContenidos />} />
+                  <Route path="servicios" element={<AdminServicios />} />
+                  <Route path="servicios/:id" element={<AdminServicioEditar />} />
                 </Route>
               </Route>
 
