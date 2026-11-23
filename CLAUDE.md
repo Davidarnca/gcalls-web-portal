@@ -24,10 +24,13 @@ para la etapa Automation 2.0 y no se tocan en este ciclo.
   cambiar a RESTRICT antes de H2/H3), `contenidos` (CMS, una fila por sección).
   En `servicios`: `color_accent` guarda la **clave del tema** (no un HEX), `icono` un nombre de la lista
   permitida y `contenido_json` `{ descripcion, tarjetas: [{ titulo, icono, items[] }] }`.
-- **Producción:** Colombia Hosting (cPanel), dominio `gcallssas.com` <!-- verificar vigencia del plan -->.
+- **Producción:** Colombia Hosting (cPanel), dominio `gcallssas.com`, plan COLHOST2 activo (renueva en ~10 meses, 23/11).
+  **PHP 8.3** desde el 23/11 (cPanel → PHP Selector; antes era 7.0 y toda la API respondía 500). Extensiones
+  activas verificadas: `gd`, `fileinfo`, `exif`, `mbstring`, `pdo`, `nd_pdo_mysql`, `mysqlnd` (no marcar
+  también `pdo_mysql`: choca con `nd_pdo_mysql`).
   `.env` se lee desde `dirname(public/api/config, 3)`: en el hosting queda **fuera** de `public_html`.
   Imágenes subidas: `storage/medios/` en esa misma raíz (o `MEDIOS_DIR` del `.env`), también fuera de
-  `public_html`: el FTP no las borra y nada subido se ejecuta. Requiere la extensión **GD** de PHP (verificar en H4).
+  `public_html`: el FTP no las borra y nada subido se ejecuta. Requiere las extensiones **gd** y **fileinfo**.
   Los respaldos de producción deben incluir esa carpeta además de la BD.
 
 ## ⚠️ Despliegue automático
@@ -47,6 +50,7 @@ descargas. No volver a conectarlo. El backend Node/Express de correo también se
 - API: `php -S localhost:8000 -t public/api` → http://localhost:8000
 - Proxy Vite: `/api/*` → `localhost:8000` **quitando el prefijo `/api`**.
 - MySQL: servicio Windows `MySQL267`, puerto 3306, base `gcalls_db`.
+- PHP local en `C:\php` (8.4): `php.ini` con `extension=gd` y `extension=fileinfo` activas (necesarias para subir imágenes).
 - Migraciones: entrar al cliente con `mysql -u root -p --default-character-set=utf8mb4 gcalls_db` y, ya en el
   prompt `mysql>`, ejecutar `source migrations/<archivo>.sql`. `source` es un comando del cliente: con `-e`
   falla con error 1064. No usar `Get-Content |` (PowerShell puede alterar la codificación).
@@ -70,14 +74,14 @@ src/
   components/Mantenimiento.tsx # Pantalla de mantenimiento
   pages/                       # Páginas públicas
   pages/ServicioDetalle.tsx    # Plantilla única de /servicios/:slug (inactivo o inexistente → 404)
-  pages/admin/                 # Login, Dashboard, Contactos (leads), Contenidos, ContenidoInicio, ContenidoIdentidad, Servicios, ServicioEditar
+  pages/admin/                 # Login, Dashboard, Contactos (leads), Contenidos, ContenidoInicio, ContenidoEquipo, ContenidoIdentidad, Servicios, ServicioEditar
 public/api/
   config/env.php               # Carga .env
   config/db.php                # get_db_connection() singleton
   config/helpers.php           # json_response(), get_json_input() — mantener pequeño
   config/auth.php              # start_secure_session, check_auth, require_auth, validate_csrf_token, destroy_session
   config/cors.php              # Lista blanca de orígenes + X-CSRF-Token
-  config/contenidos.php        # CMS: esquema de secciones (global, inicio), validar_contenido(), obtener_contenido()
+  config/contenidos.php        # CMS: esquema de secciones (global, inicio, identidad, equipo), validar_contenido()
   config/servicios.php         # Íconos y temas permitidos, validar_servicio_patch(), servicio_desde_fila()
   config/medios.php            # Usos de imagen, validación, regeneración con GD, medio_ruta(), medio_enviar()
   auth/{login,logout,me}.php
@@ -103,7 +107,7 @@ Solo cubre las rutas públicas: `/admin/*` sigue accesible en producción.
 Patrón: **campos controlados + listas editables**. Nada de editor de bloques libre.
 
 1. **Esquema (servidor):** sección y campos en `contenidos_schema()` de `public/api/config/contenidos.php`.
-   Tipos: `email`, `telefono`, `whatsapp`, `url` (solo https), `texto` (una línea), `multilinea`,
+   Tipos: `email`, `telefono`, `whatsapp`, `url` (solo https), `texto` (una línea), `multilinea` (opcional `max_lineas`),
    `icono` (lista permitida), `slug`, `imagen` (nombre de un medio del `uso` indicado; vacío = imagen
    por defecto; si el archivo ya no existe, la API pública lo omite) y `lista` (min/max elementos, cada
    uno con sus propios campos; errores en `<campo>.<i>.<subcampo>`). Vacío = no mostrar. Campos desconocidos → 400.
@@ -117,6 +121,11 @@ Patrón: **campos controlados + listas editables**. Nada de editor de bloques li
 **Inicio:** las tarjetas de especialidades enlazan a un servicio por slug; si ese servicio está oculto (o no existe),
 la tarjeta no se muestra. Con la API caída se muestran todas las del respaldo.
 
+**Nuestro Equipo:** sección `equipo`. Personas de 0 a 12 **sin respaldo** (las 4 de ejemplo eran falsas y se
+eliminaron con sus fotos): sin personas, la cuadrícula se oculta y la página queda con encabezado, valores (1 a 6)
+y llamada final. Foto con uso `retrato` (800 × 800, recortada, en círculo); sin foto, iniciales. LinkedIn y correo
+solo se muestran si se cargan. "Restaurar textos originales" conserva las personas.
+
 **Layout del panel:** `AdminLayout` usa `h-screen` y el `<main relative overflow-y-auto>` es el que hace scroll.
 No volver a `min-h-screen`: la barra de guardado `sticky bottom-0` dejaría de quedar fija y el clic en
 "Guardar" se pierde cuando aparece un error al salir del campo.
@@ -129,7 +138,7 @@ Los slugs no se editan desde el panel (son las URLs). Crear servicios nuevos aú
 Cada servicio admite una foto de fondo opcional en `contenido_json.imagen`.
 
 **Imágenes:** el panel sube con `CampoImagen` (uso `logo`, `favicon`, `compartir` o `foto`) y el contenido
-guarda solo el nombre (`<uso>-<32 hex>.<ext>`). Sección `identidad`: logo del menú (también en mantenimiento),
+guarda solo el nombre (`<uso>-<32 hex>.<ext>`; usos: también `retrato` para personas). Sección `identidad`: logo del menú (también en mantenimiento),
 logo del pie, favicon e imagen al compartir. Sin imagen subida se conserva el marcado original (el sitio
 queda idéntico). Favicon y vista previa al compartir salen de `/api/marca.php` porque esos lectores no ejecutan JS.
 
@@ -198,15 +207,16 @@ Pruebas HTTP con `curl.exe` (no el alias `curl` de PowerShell) contra `http://lo
 | Hito | Contenido | Estado |
 |---|---|---|
 | H0 Línea base | Auth real, CSRF, sesiones, CORS, codificación, retiro de legado (PR #1, `47bb001`, 22/11) | ✅ Cerrado |
-| H1a CMS esencial | PR #2 contenidos globales (contacto, horario, redes, WhatsApp) · PR #3 servicios (plantilla única, edición, publicar/ocultar, selector en formulario) · PR #4 Inicio (banner y tarjetas) · PR #6 imágenes (identidad, banner, servicios) | #2, #3, #4 fusionados (22/11) · En revisión: PR #6 |
-| H1b CMS resto | Quiénes Somos, Nuestro Equipo, Decálogo, Mercados, Qué Gestionamos | Pendiente |
+| H1a CMS esencial | PR #2 contenidos globales (contacto, horario, redes, WhatsApp) · PR #3 servicios (plantilla única, edición, publicar/ocultar, selector en formulario) · PR #4 Inicio (banner y tarjetas) · PR #6 imágenes (identidad, banner, servicios) | ✅ Cerrado (#2–#6 fusionados, 22–23/11) |
+| H1b CMS resto | PR #7 Nuestro Equipo · Quiénes Somos, Decálogo, Mercados, Qué Gestionamos | En revisión: PR #7 |
 | H2 CRM de leads | CRUD, estados, responsables, notas, próximas acciones, historial, borrado solo admin | Pendiente |
 | H3 Cotizaciones/PDF | Cotizaciones ligadas a leads, conceptos, cálculos, estados, PDF corporativo | Pendiente |
-| H4 Calidad y producción | BD y `.env` en el hosting, SMTP PHP, rate limiting, antispam, `.htaccess` SPA, backups, retiro de mantenimiento, manuales | Pendiente |
+| H4 Calidad y producción | ~~PHP 8.3 en el hosting~~ (hecho 23/11) · BD y `.env` en el hosting, SMTP PHP, rate limiting, antispam, `.htaccess` SPA, backups, retiro de mantenimiento, manuales | Pendiente |
 | H5 Automation 2.0 | n8n, IA, WhatsApp | Fuera de Core 1.0 |
 
 BD local (22/11): estructura igual a `schema.sql` previo a H1a; 1 usuario admin; 6 servicios; 9 leads; 0 cotizaciones.
-Producción: sin BD ni `.env` configurados aún; el panel responde 503 controlado.
+Producción (verificado 23/11, PHP 8.3): sin BD ni `.env` aún; la API responde 503 controlado ("No se pudo conectar
+con la base de datos"); `marca.php` entrega favicon e imagen al compartir por defecto.
 
 Pendientes menores detectados:
 - Datos reales del cliente por cargar desde el panel (correo, teléfonos, dirección, horario, redes).
@@ -217,7 +227,5 @@ Pendientes menores detectados:
 - Tarjetas de servicios en "¿Qué Gestionamos?" siguen fijas en el código (H1b).
 - Inicio: la sección "Nuestros Aliados" (empresas, cifras y testimonios) se retiró por no ser real (PR #4).
   Volverá como sección editable cuando el cliente entregue datos reales y autorización de uso de logos y testimonios.
-- Nuestro Equipo: 4 personas **falsas** (confirmado 23/11) con fotos de stock. Siguiente PR: hacerla editable
-  (nombres, cargos, fotos) sin dejar a esas personas como respaldo.
 - Imágenes subidas que dejan de usarse no se borran (falta limpieza; sin impacto práctico por ahora).
 - Leads: paginación/filtros (M-03), consulta redundante de `fecha_registro` tras INSERT (M-01).

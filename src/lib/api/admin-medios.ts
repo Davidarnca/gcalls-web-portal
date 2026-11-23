@@ -7,7 +7,7 @@ const API_URL = "/api/admin/medios.php";
 export const TIPOS_ACEPTADOS = ["image/jpeg", "image/png", "image/webp"];
 
 /** Tamaño máximo que se envía por uso (el servidor vuelve a ajustar y regenerar). */
-const LADO_MAXIMO: Record<UsoImagen, number> = { logo: 1600, favicon: 512, compartir: 2400, foto: 2400 };
+const LADO_MAXIMO: Record<UsoImagen, number> = { logo: 1600, favicon: 512, compartir: 2400, foto: 2400, retrato: 1600 };
 
 /**
  * Peso por debajo del cual se envía el archivo tal cual. El hosting suele limitar las

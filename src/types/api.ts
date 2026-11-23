@@ -90,10 +90,10 @@ export type LogoutResponse = ApiResponse<never>;
 // Campos definidos en public/api/config/contenidos.php. Todos son texto; vacío = no mostrar
 // (en las imágenes, vacío = imagen por defecto).
 
-export type ContenidoSeccion = 'global' | 'inicio' | 'identidad';
+export type ContenidoSeccion = 'global' | 'inicio' | 'identidad' | 'equipo';
 
 /** Usos de imagen aceptados por /api/admin/medios.php (definen tamaño y formato) */
-export type UsoImagen = 'logo' | 'favicon' | 'compartir' | 'foto';
+export type UsoImagen = 'logo' | 'favicon' | 'compartir' | 'foto' | 'retrato';
 
 /** POST /api/admin/medios.php */
 export interface MedioSubido {
@@ -156,6 +156,42 @@ export interface ContenidoInicio {
   especialidades_destacado: string;
   especialidades_descripcion: string;
   especialidades: EspecialidadInicio[];
+  cta_titulo: string;
+  cta_descripcion: string;
+  cta_boton: string;
+}
+
+export interface MiembroEquipo {
+  nombre: string;
+  cargo: string;
+  descripcion: string;
+  /** Una especialidad por línea (máximo 6) */
+  especialidades: string;
+  /** Foto (uso retrato). Vacío = iniciales del nombre */
+  foto: string;
+  /** https://… o vacío (no se muestra el ícono) */
+  linkedin: string;
+  /** Correo o vacío (no se muestra el ícono) */
+  email: string;
+}
+
+export interface ValorEquipo {
+  /** Nombre de ícono de la lista permitida */
+  icono: string;
+  titulo: string;
+  descripcion: string;
+}
+
+/** Sección `equipo`: página Nuestro Equipo. Sin miembros, la cuadrícula no se muestra. */
+export interface ContenidoEquipo {
+  encabezado_antetitulo: string;
+  encabezado_titulo: string;
+  encabezado_destacado: string;
+  encabezado_descripcion: string;
+  miembros: MiembroEquipo[];
+  valores_titulo: string;
+  valores_descripcion: string;
+  valores: ValorEquipo[];
   cta_titulo: string;
   cta_descripcion: string;
   cta_boton: string;

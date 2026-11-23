@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import type {
+  ContenidoEquipo,
   ContenidoGlobal,
   ContenidoIdentidad,
   ContenidoInicio,
@@ -101,6 +102,30 @@ export const CONTENIDO_IDENTIDAD_DEFAULT: ContenidoIdentidad = {
   compartir: "",
 };
 
+/**
+ * Nuestro Equipo: textos originales de la página. Sin personas de respaldo: las que
+ * había eran de ejemplo (no reales), así que la cuadrícula queda oculta hasta que el
+ * cliente agregue a su equipo desde el panel.
+ */
+export const CONTENIDO_EQUIPO_DEFAULT: ContenidoEquipo = {
+  encabezado_antetitulo: "Nuestro Equipo",
+  encabezado_titulo: "Expertos en Gestión",
+  encabezado_destacado: "Sostenible",
+  encabezado_descripcion:
+    "Un equipo multidisciplinario con amplia experiencia en sostenibilidad, gestión ambiental y responsabilidad social empresarial. Unidos por un objetivo común: transformar empresas hacia un futuro más sostenible.",
+  miembros: [],
+  valores_titulo: "Nuestros Valores",
+  valores_descripcion: "Los pilares que guían nuestro trabajo diario",
+  valores: [
+    { icono: "Award", titulo: "Excelencia", descripcion: "Nos comprometemos con los más altos estándares de calidad en cada proyecto" },
+    { icono: "Target", titulo: "Resultados", descripcion: "Enfocados en generar impacto real y medible en cada organización" },
+    { icono: "Heart", titulo: "Compromiso", descripcion: "Apasionados por la sostenibilidad y el futuro del planeta" },
+  ],
+  cta_titulo: "¿Listo para Trabajar con Nosotros?",
+  cta_descripcion: "Contáctanos y descubre cómo podemos ayudar a tu empresa a alcanzar sus objetivos de sostenibilidad",
+  cta_boton: "Contáctanos Ahora",
+};
+
 /** Combina lo guardado con el respaldo, campo por campo (texto o listas). */
 export function combinarConRespaldo<T extends object>(
   respaldo: T,
@@ -154,6 +179,10 @@ export const useContenidoGlobal = (): ContenidoGlobal =>
 /** Banner, especialidades y llamada final de la página de inicio. */
 export const useContenidoInicio = (): ContenidoInicio =>
   useContenido("inicio", CONTENIDO_INICIO_DEFAULT);
+
+/** Página Nuestro Equipo. */
+export const useContenidoEquipo = (): ContenidoEquipo =>
+  useContenido("equipo", CONTENIDO_EQUIPO_DEFAULT);
 
 /** Logos e imágenes de marca. */
 export const useContenidoIdentidad = (): ContenidoIdentidad =>

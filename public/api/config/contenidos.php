@@ -20,6 +20,7 @@ require_once __DIR__ . '/medios.php';    // imágenes subidas
  *   url        Dirección https:// completa.
  *   texto      Una línea de texto.
  *   multilinea Varias líneas (cada línea se muestra por separado en el sitio).
+ *              Con 'max_lineas', limita el número de líneas con texto.
  *   icono      Nombre de ícono de la lista permitida (SERVICIOS_ICONOS).
  *   slug       Identificador de servicio (minúsculas, números y guiones).
  *   imagen     Nombre de una imagen subida con /api/admin/medios.php para el 'uso'
@@ -57,6 +58,38 @@ function contenidos_schema(): array
             'logo_pie'  => ['tipo' => 'imagen', 'uso' => 'logo',      'max' => 80, 'etiqueta' => 'Logo del pie de página'],
             'favicon'   => ['tipo' => 'imagen', 'uso' => 'favicon',   'max' => 80, 'etiqueta' => 'Ícono de la pestaña'],
             'compartir' => ['tipo' => 'imagen', 'uso' => 'compartir', 'max' => 80, 'etiqueta' => 'Imagen al compartir'],
+        ],
+        'equipo' => [
+            'encabezado_antetitulo'  => ['tipo' => 'texto',      'max' => 40,  'etiqueta' => 'Etiqueta del encabezado'],
+            'encabezado_titulo'      => ['tipo' => 'texto',      'max' => 80,  'etiqueta' => 'Título del encabezado'],
+            'encabezado_destacado'   => ['tipo' => 'texto',      'max' => 80,  'etiqueta' => 'Título destacado del encabezado'],
+            'encabezado_descripcion' => ['tipo' => 'multilinea', 'max' => 500, 'etiqueta' => 'Descripción del encabezado'],
+            // Sin personas, el sitio oculta la cuadrícula (nunca se muestran personas de ejemplo)
+            'miembros' => [
+                'tipo' => 'lista', 'min' => 0, 'max' => 12, 'etiqueta' => 'Persona',
+                'campos' => [
+                    'nombre'         => ['tipo' => 'texto',      'max' => 80,  'etiqueta' => 'Nombre', 'requerido' => true],
+                    'cargo'          => ['tipo' => 'texto',      'max' => 100, 'etiqueta' => 'Cargo'],
+                    'descripcion'    => ['tipo' => 'multilinea', 'max' => 300, 'etiqueta' => 'Descripción'],
+                    'especialidades' => ['tipo' => 'multilinea', 'max' => 400, 'etiqueta' => 'Especialidades', 'max_lineas' => 6],
+                    'foto'           => ['tipo' => 'imagen',     'uso' => 'retrato', 'max' => 80, 'etiqueta' => 'Foto'],
+                    'linkedin'       => ['tipo' => 'url',        'max' => 300, 'etiqueta' => 'LinkedIn'],
+                    'email'          => ['tipo' => 'email',      'max' => 180, 'etiqueta' => 'Correo'],
+                ],
+            ],
+            'valores_titulo'      => ['tipo' => 'texto', 'max' => 60,  'etiqueta' => 'Título de valores'],
+            'valores_descripcion' => ['tipo' => 'texto', 'max' => 150, 'etiqueta' => 'Descripción de valores'],
+            'valores' => [
+                'tipo' => 'lista', 'min' => 1, 'max' => 6, 'etiqueta' => 'Valor',
+                'campos' => [
+                    'icono'       => ['tipo' => 'icono',      'max' => 40,  'etiqueta' => 'Ícono', 'requerido' => true],
+                    'titulo'      => ['tipo' => 'texto',      'max' => 60,  'etiqueta' => 'Título', 'requerido' => true],
+                    'descripcion' => ['tipo' => 'multilinea', 'max' => 250, 'etiqueta' => 'Descripción'],
+                ],
+            ],
+            'cta_titulo'      => ['tipo' => 'texto',      'max' => 100, 'etiqueta' => 'Título de la llamada final'],
+            'cta_descripcion' => ['tipo' => 'multilinea', 'max' => 300, 'etiqueta' => 'Descripción de la llamada final'],
+            'cta_boton'       => ['tipo' => 'texto',      'max' => 40,  'etiqueta' => 'Botón de la llamada final'],
         ],
         'inicio' => [
             'hero_imagen'              => ['tipo' => 'imagen',     'uso' => 'foto', 'max' => 80, 'etiqueta' => 'Foto de fondo del banner'],
@@ -202,6 +235,13 @@ function validar_valor(array $regla, mixed $valor): array
 
     if ($regla['tipo'] !== 'multilinea' && str_contains($valor, "\n")) {
         return ['', 'debe ser una sola línea.'];
+    }
+
+    if (isset($regla['max_lineas'])) {
+        $conTexto = array_filter(array_map('trim', explode("\n", $valor)), static fn($l) => $l !== '');
+        if (count($conTexto) > $regla['max_lineas']) {
+            return ['', 'máximo ' . $regla['max_lineas'] . ' líneas.'];
+        }
     }
 
     switch ($regla['tipo']) {
