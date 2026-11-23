@@ -129,8 +129,13 @@ function medio_guardar_subida(array $archivo, string $uso): array
     if (!array_key_exists($uso, MEDIOS_USOS)) {
         return [null, 'Uso de imagen no válido.'];
     }
-    if (!extension_loaded('gd')) {
-        error_log('[medios] La extensión GD de PHP no está activa.');
+    // GD procesa la imagen y fileinfo detecta su tipo real. En Windows vienen desactivadas
+    // por defecto en php.ini (extension=gd, extension=fileinfo).
+    if (!extension_loaded('gd') || !class_exists('finfo')) {
+        error_log('[medios] Faltan extensiones de PHP: ' . implode(', ', array_filter([
+            extension_loaded('gd') ? null : 'gd',
+            class_exists('finfo') ? null : 'fileinfo',
+        ])) . '. Actívalas en php.ini.');
         return [null, 'El servidor no puede procesar imágenes en este momento.'];
     }
 
