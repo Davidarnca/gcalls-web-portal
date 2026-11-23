@@ -1,7 +1,7 @@
 import {
   Activity, Award, BarChart3, BrainCircuit, Briefcase, Building2, CheckCircle2,
   ClipboardCheck, Container, Factory, FileCheck, Gavel, Globe, Handshake, HardHat,
-  HeartHandshake, Landmark, Leaf, Lightbulb, LineChart, Recycle, Scale, Settings,
+  Heart, HeartHandshake, Landmark, Leaf, Lightbulb, LineChart, Recycle, Scale, Settings,
   ShieldAlert, ShieldCheck, Sprout, Stethoscope, Target, TreePine, TrendingUp,
   Truck, UserCheck, Users, Users2,
   type LucideIcon,
@@ -14,7 +14,7 @@ import {
 export const ICONOS: Record<string, LucideIcon> = {
   Activity, Award, BarChart3, BrainCircuit, Briefcase, Building2, CheckCircle2,
   ClipboardCheck, Container, Factory, FileCheck, Gavel, Globe, Handshake, HardHat,
-  HeartHandshake, Landmark, Leaf, Lightbulb, LineChart, Recycle, Scale, Settings,
+  Heart, HeartHandshake, Landmark, Leaf, Lightbulb, LineChart, Recycle, Scale, Settings,
   ShieldAlert, ShieldCheck, Sprout, Stethoscope, Target, TreePine, TrendingUp,
   Truck, UserCheck, Users, Users2,
 };
