@@ -5,7 +5,7 @@
  * se sirve desde /api/medio.php. Un nombre vacío significa "usar la imagen por defecto".
  */
 
-const PATRON = /^(logo|favicon|compartir|foto)-[a-f0-9]{32}\.(webp|png|jpg)$/;
+const PATRON = /^(logo|favicon|compartir|foto|retrato)-[a-f0-9]{32}\.(webp|png|jpg)$/;
 
 /** URL pública de una imagen subida, o null si el nombre está vacío o no es válido. */
 export function urlMedio(nombre: string | null | undefined): string | null {

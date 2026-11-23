@@ -15,6 +15,7 @@ const VISTA: Record<UsoImagen, string> = {
   favicon: "h-20 w-20",
   compartir: "aspect-[1200/630] w-full max-w-sm",
   foto: "aspect-video w-full max-w-sm",
+  retrato: "h-28 w-28 rounded-full",
 };
 
 const RECOMENDACION: Record<UsoImagen, string> = {
@@ -22,6 +23,7 @@ const RECOMENDACION: Record<UsoImagen, string> = {
   favicon: "Imagen cuadrada (PNG con fondo transparente), de al menos 192 × 192 px.",
   compartir: "Horizontal, ideal 1200 × 630 px. Se recorta al centro a esa proporción.",
   foto: "Horizontal, de al menos 1600 px de ancho. Se ve detrás del texto, con un filtro de color encima.",
+  retrato: "Foto de la persona, de al menos 400 × 400 px. Se recorta en cuadrado al centro y se muestra en círculo.",
 };
 
 interface CampoImagenProps {
@@ -111,7 +113,7 @@ const CampoImagen: React.FC<CampoImagenProps> = ({
             <img
               src={vista}
               alt={`Vista previa: ${etiqueta}`}
-              className={`max-h-full max-w-full ${uso === "foto" || uso === "compartir" ? "h-full w-full object-cover" : "object-contain p-2"}`}
+              className={`max-h-full max-w-full ${uso === "foto" || uso === "compartir" || uso === "retrato" ? "h-full w-full object-cover" : "object-contain p-2"}`}
             />
           ) : (
             <span className="flex flex-col items-center gap-1 text-xs text-muted-foreground p-3 text-center">
