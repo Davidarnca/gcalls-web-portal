@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/sonner";
+import ContenidosTabs from "@/components/admin/ContenidosTabs";
 
 const API_URL = "/api/admin/contenidos.php?seccion=global";
 
@@ -213,6 +214,8 @@ const AdminContenidos: React.FC = () => {
 
   return (
     <div className="p-4 md:p-8 space-y-6 max-w-5xl mx-auto">
+      <ContenidosTabs />
+
       {/* Encabezado */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-lg shadow-sm border">
         <div>
