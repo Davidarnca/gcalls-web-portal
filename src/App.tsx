@@ -25,6 +25,7 @@ import Dashboard from "./pages/admin/Dashboard";
 import AdminContactos from "./pages/admin/Contactos";
 import AdminContenidos from "./pages/admin/Contenidos";
 import AdminContenidoInicio from "./pages/admin/ContenidoInicio";
+import AdminContenidoIdentidad from "./pages/admin/ContenidoIdentidad";
 import AdminServicios from "./pages/admin/Servicios";
 import AdminServicioEditar from "./pages/admin/ServicioEditar";
 import ServicioDetalle from "./pages/ServicioDetalle";
@@ -60,6 +61,7 @@ const App = () => {
                   <Route path="contactos" element={<AdminContactos />} />
                   <Route path="contenidos" element={<AdminContenidos />} />
                   <Route path="contenidos/inicio" element={<AdminContenidoInicio />} />
+                  <Route path="contenidos/identidad" element={<AdminContenidoIdentidad />} />
                   <Route path="servicios" element={<AdminServicios />} />
                   <Route path="servicios/:id" element={<AdminServicioEditar />} />
                 </Route>

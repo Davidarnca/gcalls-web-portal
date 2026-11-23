@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/servicios.php'; // SERVICIOS_ICONOS
+require_once __DIR__ . '/medios.php';    // imágenes subidas
 
 /**
  * Definición y validación de las secciones editables del CMS.
@@ -21,6 +22,9 @@ require_once __DIR__ . '/servicios.php'; // SERVICIOS_ICONOS
  *   multilinea Varias líneas (cada línea se muestra por separado en el sitio).
  *   icono      Nombre de ícono de la lista permitida (SERVICIOS_ICONOS).
  *   slug       Identificador de servicio (minúsculas, números y guiones).
+ *   imagen     Nombre de una imagen subida con /api/admin/medios.php para el 'uso'
+ *              indicado (logo, favicon, compartir, foto). Vacío = imagen por defecto.
+ *              Si el archivo ya no existe, la API pública no lo devuelve.
  *
  * Tipo lista:
  *   lista      Lista de elementos con sus propios campos ('campos'), entre 'min' y 'max'.
@@ -48,7 +52,14 @@ function contenidos_schema(): array
             'facebook'            => ['tipo' => 'url',        'max' => 300, 'etiqueta' => 'Facebook'],
             'instagram'           => ['tipo' => 'url',        'max' => 300, 'etiqueta' => 'Instagram'],
         ],
+        'identidad' => [
+            'logo'      => ['tipo' => 'imagen', 'uso' => 'logo',      'max' => 80, 'etiqueta' => 'Logo del menú'],
+            'logo_pie'  => ['tipo' => 'imagen', 'uso' => 'logo',      'max' => 80, 'etiqueta' => 'Logo del pie de página'],
+            'favicon'   => ['tipo' => 'imagen', 'uso' => 'favicon',   'max' => 80, 'etiqueta' => 'Ícono de la pestaña'],
+            'compartir' => ['tipo' => 'imagen', 'uso' => 'compartir', 'max' => 80, 'etiqueta' => 'Imagen al compartir'],
+        ],
         'inicio' => [
+            'hero_imagen'              => ['tipo' => 'imagen',     'uso' => 'foto', 'max' => 80, 'etiqueta' => 'Foto de fondo del banner'],
             'hero_antetitulo'          => ['tipo' => 'texto',      'max' => 60,  'etiqueta' => 'Antetítulo del banner'],
             'hero_titulo'              => ['tipo' => 'texto',      'max' => 80,  'etiqueta' => 'Título del banner'],
             'hero_titulo_destacado'    => ['tipo' => 'texto',      'max' => 80,  'etiqueta' => 'Título destacado del banner'],
@@ -237,6 +248,15 @@ function validar_valor(array $regla, mixed $valor): array
                 return ['', 'elige un servicio de la lista.'];
             }
             break;
+
+        case 'imagen':
+            if (!medio_nombre_valido($valor, $regla['uso'])) {
+                return ['', 'imagen no válida; súbela de nuevo.'];
+            }
+            if (medio_ruta($valor) === null) {
+                return ['', 'la imagen ya no existe; súbela de nuevo.'];
+            }
+            break;
     }
 
     return [$valor, null];
@@ -264,6 +284,11 @@ function filtrar_vigentes(array $campos, array $datos): array
                     static fn($e) => is_array($e) ? filtrar_vigentes($regla['campos'], $e) : [],
                     $valor
                 ));
+            }
+        } elseif ($regla['tipo'] === 'imagen') {
+            // Una imagen borrada o con nombre ajeno no se expone: el sitio usa la de respaldo
+            if (is_string($valor) && ($valor === '' || (medio_nombre_valido($valor, $regla['uso']) && medio_ruta($valor) !== null))) {
+                $vigentes[$campo] = $valor;
             }
         } elseif (is_string($valor)) {
             $vigentes[$campo] = $valor;

@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.svg";
 import logoWhite from "@/assets/logo-white.svg";
 import { rutaServicio, useServicios } from "@/lib/servicios";
+import { useContenidoIdentidad } from "@/lib/contenidos";
+import { urlMedio } from "@/lib/medios";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,6 +14,8 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const { servicios } = useServicios();
+  // Logo subido desde el panel (Contenidos → Identidad); si no hay, el original
+  const logoSubido = urlMedio(useContenidoIdentidad().logo);
 
   const isHomePage = location.pathname === "/";
 
@@ -64,11 +68,20 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-20 md:h-24 lg:h-28">
           {/* Logo */}
           <Link to="/" onClick={() => window.scrollTo(0, 0)} className="flex items-center gap-2 sm:gap-3 group">
-            <img
-              src={currentLogo}
-              alt="Gestión & Consultoría S.A.S Logo"
-              className="h-16 w-16 sm:h-20 sm:w-20 md:h-22 md:w-22 lg:h-28 lg:w-28 transition-transform duration-300 group-hover:scale-105"
-            />
+            {logoSubido ? (
+              // Sin márgenes internos como el SVG original: se ajusta por altura
+              <img
+                src={logoSubido}
+                alt="G-Calls S.A.S Logo"
+                className="h-10 sm:h-12 lg:h-14 w-auto max-w-[180px] object-contain transition-transform duration-300 group-hover:scale-105"
+              />
+            ) : (
+              <img
+                src={currentLogo}
+                alt="Gestión & Consultoría S.A.S Logo"
+                className="h-16 w-16 sm:h-20 sm:w-20 md:h-22 md:w-22 lg:h-28 lg:w-28 transition-transform duration-300 group-hover:scale-105"
+              />
+            )}
             <span className="text-base sm:text-lg md:text-lg lg:text-xl font-semibold transition-colors duration-300 text-gradient">
               G-Calls S.A.S
             </span>

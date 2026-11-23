@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type {
   ContenidoGlobal,
+  ContenidoIdentidad,
   ContenidoInicio,
   ContenidoPublicoResponse,
   ContenidoSeccion,
@@ -34,6 +35,7 @@ export const CONTENIDO_GLOBAL_DEFAULT: ContenidoGlobal = {
  * enlazan a servicios del catálogo por su slug.
  */
 export const CONTENIDO_INICIO_DEFAULT: ContenidoInicio = {
+  hero_imagen: "",
   hero_antetitulo: "G-Calls S.A.S",
   hero_titulo: "Gestión Sostenible",
   hero_titulo_destacado: "Para el Futuro",
@@ -86,6 +88,17 @@ export const CONTENIDO_INICIO_DEFAULT: ContenidoInicio = {
   cta_descripcion:
     "Descubra cómo nuestras soluciones pueden impulsar la sostenibilidad y eficiencia de su organización.",
   cta_boton: "Solicite una Consulta",
+};
+
+/**
+ * Identidad: vacío en todos los campos = se usan los logos e imágenes originales del
+ * sitio (src/assets y public/favicon.png, public/og-image.jpg).
+ */
+export const CONTENIDO_IDENTIDAD_DEFAULT: ContenidoIdentidad = {
+  logo: "",
+  logo_pie: "",
+  favicon: "",
+  compartir: "",
 };
 
 /** Combina lo guardado con el respaldo, campo por campo (texto o listas). */
@@ -141,6 +154,10 @@ export const useContenidoGlobal = (): ContenidoGlobal =>
 /** Banner, especialidades y llamada final de la página de inicio. */
 export const useContenidoInicio = (): ContenidoInicio =>
   useContenido("inicio", CONTENIDO_INICIO_DEFAULT);
+
+/** Logos e imágenes de marca. */
+export const useContenidoIdentidad = (): ContenidoIdentidad =>
+  useContenido("identidad", CONTENIDO_IDENTIDAD_DEFAULT);
 
 // ── Utilidades de presentación ───────────────────────────────────────────────
 

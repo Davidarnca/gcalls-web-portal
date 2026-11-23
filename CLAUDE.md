@@ -26,6 +26,9 @@ para la etapa Automation 2.0 y no se tocan en este ciclo.
   permitida y `contenido_json` `{ descripcion, tarjetas: [{ titulo, icono, items[] }] }`.
 - **Producción:** Colombia Hosting (cPanel), dominio `gcallssas.com` <!-- verificar vigencia del plan -->.
   `.env` se lee desde `dirname(public/api/config, 3)`: en el hosting queda **fuera** de `public_html`.
+  Imágenes subidas: `storage/medios/` en esa misma raíz (o `MEDIOS_DIR` del `.env`), también fuera de
+  `public_html`: el FTP no las borra y nada subido se ejecuta. Requiere la extensión **GD** de PHP (verificar en H4).
+  Los respaldos de producción deben incluir esa carpeta además de la BD.
 
 ## ⚠️ Despliegue automático
 
@@ -39,7 +42,7 @@ descargas. No volver a conectarlo. El backend Node/Express de correo también se
 
 ## Entorno local (Windows + PowerShell)
 
-- Repo: `C:\Proyectos\gcalls-web-portal`
+- Repo: `C:\Proyectos\gcalls-sas\gcalls-web-portal` (respaldos de BD en `C:\Proyectos\gcalls-sas\`, fuera del repo)
 - Frontend: `npm run dev` → http://localhost:8080
 - API: `php -S localhost:8000 -t public/api` → http://localhost:8000
 - Proxy Vite: `/api/*` → `localhost:8000` **quitando el prefijo `/api`**.
@@ -58,14 +61,16 @@ src/
   lib/contenidos.ts            # CMS: valores de respaldo, useContenidoGlobal(), utilidades de enlaces
   lib/servicios.ts             # Servicios: temas de color, contenido de respaldo, useServicios()
   lib/iconos.ts                # Íconos permitidos (= SERVICIOS_ICONOS en PHP)
+  lib/medios.ts                # urlMedio(): URL pública de una imagen subida (vacío = imagen por defecto)
+  lib/api/admin-medios.ts      # subirImagen(): reduce en el navegador y sube a /api/admin/medios.php
   lib/api/admin-servicios.ts   # Cliente de /api/admin/servicios.php
   lib/api/*.mock.ts            # Mocks DEV (import dinámico)
   contexts/AuthContext.tsx     # Sesión real contra /api/auth/*; usuario y csrfToken en memoria
-  components/admin/            # AdminLayout, AdminSidebar, AdminNavbar, ProtectedRoute, ContenidosTabs, SelectorIcono
+  components/admin/            # AdminLayout, AdminSidebar, AdminNavbar, ProtectedRoute, ContenidosTabs, SelectorIcono, CampoImagen
   components/Mantenimiento.tsx # Pantalla de mantenimiento
   pages/                       # Páginas públicas
   pages/ServicioDetalle.tsx    # Plantilla única de /servicios/:slug (inactivo o inexistente → 404)
-  pages/admin/                 # Login, Dashboard, Contactos (leads), Contenidos, ContenidoInicio, Servicios, ServicioEditar
+  pages/admin/                 # Login, Dashboard, Contactos (leads), Contenidos, ContenidoInicio, ContenidoIdentidad, Servicios, ServicioEditar
 public/api/
   config/env.php               # Carga .env
   config/db.php                # get_db_connection() singleton
@@ -74,13 +79,17 @@ public/api/
   config/cors.php              # Lista blanca de orígenes + X-CSRF-Token
   config/contenidos.php        # CMS: esquema de secciones (global, inicio), validar_contenido(), obtener_contenido()
   config/servicios.php         # Íconos y temas permitidos, validar_servicio_patch(), servicio_desde_fila()
+  config/medios.php            # Usos de imagen, validación, regeneración con GD, medio_ruta(), medio_enviar()
   auth/{login,logout,me}.php
   contactos.php                # POST público del formulario
   contenidos.php               # GET público ?seccion=
   servicios.php                # GET público: servicios activos
+  medio.php                    # GET público ?f=<nombre>: entrega una imagen subida (caché 1 año)
+  marca.php                    # GET ?tipo=favicon|compartir: imagen de Identidad o la de public/ (index.html)
   admin/contactos.php          # GET leads con servicio_titulo (admin, editor), LIMIT 200
   admin/contenidos.php         # GET (admin, editor, viewer) / PUT con CSRF (admin, editor) ?seccion=
   admin/servicios.php          # GET todos / PATCH ?id= parcial con CSRF (activo, titulo, icono, tema, contenido)
+  admin/medios.php             # POST multipart (archivo, uso) con CSRF (admin, editor) → nombre de la imagen
 migrations/                    # Cambios de esquema posteriores a schema.sql
 scripts/create_admin.php       # CLI, contraseña oculta. NO ejecutar sin autorización
 scripts/seed_servicios.php     # Idempotente. NO ejecutar sin autorización
@@ -95,8 +104,9 @@ Patrón: **campos controlados + listas editables**. Nada de editor de bloques li
 
 1. **Esquema (servidor):** sección y campos en `contenidos_schema()` de `public/api/config/contenidos.php`.
    Tipos: `email`, `telefono`, `whatsapp`, `url` (solo https), `texto` (una línea), `multilinea`,
-   `icono` (lista permitida), `slug` y `lista` (min/max elementos, cada uno con sus propios campos;
-   errores en `<campo>.<i>.<subcampo>`). Vacío = no mostrar. Campos desconocidos → 400.
+   `icono` (lista permitida), `slug`, `imagen` (nombre de un medio del `uso` indicado; vacío = imagen
+   por defecto; si el archivo ya no existe, la API pública lo omite) y `lista` (min/max elementos, cada
+   uno con sus propios campos; errores en `<campo>.<i>.<subcampo>`). Vacío = no mostrar. Campos desconocidos → 400.
 2. **Tipos:** interfaz en `src/types/api.ts` y la sección en `ContenidoSeccion`.
 3. **Respaldo:** valores por defecto en `src/lib/contenidos.ts`. El sitio **nunca** queda en blanco:
    si la API falla o la sección no se ha guardado, se muestra el respaldo.
@@ -116,6 +126,12 @@ No volver a `min-h-screen`: la barra de guardado `sticky bottom-0` dejaría de q
 Los temas usan clases Tailwind escritas completas (no construirlas con interpolación).
 Si un servicio no tiene ícono, tema o contenido válidos guardados, se usa su respaldo (contenido original).
 Los slugs no se editan desde el panel (son las URLs). Crear servicios nuevos aún no está soportado.
+Cada servicio admite una foto de fondo opcional en `contenido_json.imagen`.
+
+**Imágenes:** el panel sube con `CampoImagen` (uso `logo`, `favicon`, `compartir` o `foto`) y el contenido
+guarda solo el nombre (`<uso>-<32 hex>.<ext>`). Sección `identidad`: logo del menú (también en mantenimiento),
+logo del pie, favicon e imagen al compartir. Sin imagen subida se conserva el marcado original (el sitio
+queda idéntico). Favicon y vista previa al compartir salen de `/api/marca.php` porque esos lectores no ejecutan JS.
 
 ## Comandos de verificación
 
@@ -153,6 +169,9 @@ Pruebas HTTP con `curl.exe` (no el alias `curl` de PowerShell) contra `http://lo
 - Toda operación mutativa (POST/PUT/PATCH/DELETE admin y logout) exige `X-CSRF-Token` → `validate_csrf_token()`.
 - Nunca devolver `password_hash`; mensaje uniforme ante credenciales inválidas; rate limiting en login (pendiente H4).
 - URLs editables desde el panel: solo `https://` (bloquea `javascript:` y similares).
+- Imágenes: solo JPG, PNG y WebP detectados por contenido (**nunca SVG**), límites de peso, píxeles por lado
+  y megapíxeles; se regeneran con GD (sin metadatos ni contenido oculto), nombre aleatorio, guardadas fuera
+  de `public_html` y entregadas solo por `medio.php` con `nosniff` y CSP `sandbox`.
 - Secretos solo en `.env` fuera del repo; usuario MySQL de producción con privilegios mínimos.
 - CORS: orígenes `gcallssas.com` (+ www) y Vite local. En producción sitio y API comparten origen.
 - Envío de correo (SMTP en PHP, H4): si falla, el lead ya persistido no se pierde ni se reporta error al visitante.
@@ -179,7 +198,7 @@ Pruebas HTTP con `curl.exe` (no el alias `curl` de PowerShell) contra `http://lo
 | Hito | Contenido | Estado |
 |---|---|---|
 | H0 Línea base | Auth real, CSRF, sesiones, CORS, codificación, retiro de legado (PR #1, `47bb001`, 22/11) | ✅ Cerrado |
-| H1a CMS esencial | PR #2 contenidos globales (contacto, horario, redes, WhatsApp) · PR #3 servicios (plantilla única, edición, publicar/ocultar, selector en formulario) · PR #4 Inicio (banner y tarjetas) · PR #5 imágenes | En revisión: PR #2, PR #3 y PR #4 |
+| H1a CMS esencial | PR #2 contenidos globales (contacto, horario, redes, WhatsApp) · PR #3 servicios (plantilla única, edición, publicar/ocultar, selector en formulario) · PR #4 Inicio (banner y tarjetas) · PR #6 imágenes (identidad, banner, servicios) | #2, #3, #4 fusionados (22/11) · En revisión: PR #6 |
 | H1b CMS resto | Quiénes Somos, Nuestro Equipo, Decálogo, Mercados, Qué Gestionamos | Pendiente |
 | H2 CRM de leads | CRUD, estados, responsables, notas, próximas acciones, historial, borrado solo admin | Pendiente |
 | H3 Cotizaciones/PDF | Cotizaciones ligadas a leads, conceptos, cálculos, estados, PDF corporativo | Pendiente |
@@ -198,6 +217,7 @@ Pendientes menores detectados:
 - Tarjetas de servicios en "¿Qué Gestionamos?" siguen fijas en el código (H1b).
 - Inicio: la sección "Nuestros Aliados" (empresas, cifras y testimonios) se retiró por no ser real (PR #4).
   Volverá como sección editable cuando el cliente entregue datos reales y autorización de uso de logos y testimonios.
-- Nuestro Equipo: 4 personas con fotos de stock y LinkedIn "#"; confirmar con el cliente si son reales (H1b).
-- La página de servicio tipo marca usa una imagen de Unsplash enlazada externamente (conviene alojarla).
+- Nuestro Equipo: 4 personas **falsas** (confirmado 23/11) con fotos de stock. Siguiente PR: hacerla editable
+  (nombres, cargos, fotos) sin dejar a esas personas como respaldo.
+- Imágenes subidas que dejan de usarse no se borran (falta limpieza; sin impacto práctico por ahora).
 - Leads: paginación/filtros (M-03), consulta redundante de `fecha_registro` tras INSERT (M-01).

@@ -8,7 +8,9 @@ import {
   lineas,
   ubicacion,
   useContenidoGlobal,
+  useContenidoIdentidad,
 } from "@/lib/contenidos";
+import { urlMedio } from "@/lib/medios";
 import { rutaServicio, useServicios } from "@/lib/servicios";
 
 const iconoContacto =
@@ -17,6 +19,8 @@ const iconoContacto =
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const contacto = useContenidoGlobal();
+  // Logo subido desde el panel (Contenidos → Identidad); si no hay, el original
+  const logoPieSubido = urlMedio(useContenidoIdentidad().logo_pie);
   const { servicios } = useServicios();
 
   const telefonos = [contacto.telefono, contacto.telefono_secundario].filter(Boolean);
@@ -37,7 +41,11 @@ const Footer = () => {
           {/* Company Section - Spans 2 columns on large screens */}
           <div className="lg:col-span-2 space-y-4 md:space-y-6">
             <div className="flex items-center gap-3 md:gap-4 mb-3">
-              <img src={footerLogo} alt="G-Calls Logo" className="h-16 w-16 md:h-20 md:w-20 lg:h-24 lg:w-24 object-contain" />
+              {logoPieSubido ? (
+                <img src={logoPieSubido} alt="G-Calls Logo" className="h-16 md:h-20 lg:h-24 w-auto max-w-[200px] object-contain" />
+              ) : (
+                <img src={footerLogo} alt="G-Calls Logo" className="h-16 w-16 md:h-20 md:w-20 lg:h-24 lg:w-24 object-contain" />
+              )}
               <div className="flex flex-col justify-center">
                 <h2 className="text-xl md:text-2xl lg:text-[1.65rem] font-bold text-white mb-1">Gestión Sostenible</h2>
                 <p className="text-sm md:text-base text-blue-300/70 font-medium">G-Calls S.A.S</p>
@@ -71,7 +79,7 @@ const Footer = () => {
             <ul className="space-y-2 md:space-y-3">
               {[
                 { label: "Inicio", path: "/" },
-                { label: "Principios", path: "/decálogo" },
+                { label: "Principios", path: "/decalogo" },
                 { label: "Quiénes Somos", path: "/quiénes-somos" },
                 { label: "Nuestros Mercados", path: "/nuestros-mercados" },
                 { label: "Qué Gestionamos", path: "/que-gestionamos" },

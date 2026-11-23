@@ -1,6 +1,11 @@
 import logoSvg from "@/assets/logo.svg";
+import { useContenidoIdentidad } from "@/lib/contenidos";
+import { urlMedio } from "@/lib/medios";
 
 export default function MaintenancePage() {
+  // Logo subido desde el panel; si no hay, el original
+  const logoSubido = urlMedio(useContenidoIdentidad().logo);
+
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center bg-[#0B1120] px-5 py-20 relative overflow-hidden">
       {/* Ambient glow */}
@@ -10,11 +15,16 @@ export default function MaintenancePage() {
       <div className="w-full max-w-[800px] flex flex-col items-center gap-5 bg-[#151F32]/80 border border-white/5 backdrop-blur-sm rounded-2xl px-6 md:px-12 py-10 md:py-12 relative z-10">
         {/* Logo G-Calls escalado directamente */}
         <div className="flex items-center justify-center w-full py-4 overflow-visible">
-          <img
-            src={logoSvg}
-            alt="G-Calls S.A.S."
-            className="h-36 w-auto max-w-full object-contain scale-[1.25] sm:h-44 sm:scale-[1.4] md:h-56 md:scale-[1.8] lg:h-64 lg:scale-[2.2] transform-gpu origin-center transition-transform hover:scale-[2.4]"
-          />
+          {logoSubido ? (
+            // Sin los márgenes del SVG original: no necesita escalarse
+            <img src={logoSubido} alt="G-Calls S.A.S." className="h-28 sm:h-32 md:h-40 w-auto max-w-full object-contain" />
+          ) : (
+            <img
+              src={logoSvg}
+              alt="G-Calls S.A.S."
+              className="h-36 w-auto max-w-full object-contain scale-[1.25] sm:h-44 sm:scale-[1.4] md:h-56 md:scale-[1.8] lg:h-64 lg:scale-[2.2] transform-gpu origin-center transition-transform hover:scale-[2.4]"
+            />
+          )}
         </div>
 
         {/* Status badge */}

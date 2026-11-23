@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/medios.php'; // fotos de fondo
+
 /**
  * Catálogo de servicios: listas permitidas, normalización y validación.
  *
@@ -13,7 +15,8 @@ declare(strict_types=1);
  *   titulo        → nombre visible
  *   icono         → ícono principal (nombre de la lista SERVICIOS_ICONOS)
  *   color_accent  → tema de color (clave de SERVICIOS_TEMAS)
- *   contenido_json→ { descripcion: string, tarjetas: [{ titulo, icono, items: string[] }] }
+ *   contenido_json→ { descripcion: string, tarjetas: [{ titulo, icono, items: string[] }], imagen?: string }
+ *                   imagen: foto de fondo subida con uso 'foto' (opcional; vacía = sin foto)
  *   activo        → 1 visible en el sitio / 0 oculto
  *
  * Si un servicio no tiene ícono, tema o contenido válidos guardados, el frontend usa
@@ -53,6 +56,14 @@ function servicio_desde_fila(array $fila): array
     if ($fila['contenido_json'] !== null) {
         $decodificado = json_decode((string) $fila['contenido_json'], true);
         $contenido = is_array($decodificado) ? $decodificado : null;
+    }
+
+    // Una foto borrada o con nombre ajeno no se expone (el sitio la omite)
+    if (is_array($contenido) && array_key_exists('imagen', $contenido)) {
+        $imagen = $contenido['imagen'];
+        if (!is_string($imagen) || $imagen === '' || !medio_nombre_valido($imagen, 'foto') || medio_ruta($imagen) === null) {
+            unset($contenido['imagen']);
+        }
     }
 
     $icono = (string) $fila['icono'];
@@ -151,8 +162,19 @@ function validar_contenido_servicio(mixed $c): array
     $L = SERVICIOS_LIMITES;
     $errores = [];
 
-    if (!is_array($c) || array_diff(array_map('strval', array_keys($c)), ['descripcion', 'tarjetas']) !== []) {
-        return [[], ['contenido' => 'El contenido solo admite "descripcion" y "tarjetas".']];
+    if (!is_array($c) || array_diff(array_map('strval', array_keys($c)), ['descripcion', 'tarjetas', 'imagen']) !== []) {
+        return [[], ['contenido' => 'El contenido solo admite "descripcion", "tarjetas" e "imagen".']];
+    }
+
+    // Foto de fondo opcional: nombre de una imagen subida con uso 'foto'
+    $imagen = $c['imagen'] ?? '';
+    if (!is_string($imagen)) {
+        $errores['imagen'] = 'La foto de fondo no es válida; súbela de nuevo.';
+        $imagen = '';
+    } elseif ($imagen !== '' && !medio_nombre_valido($imagen, 'foto')) {
+        $errores['imagen'] = 'La foto de fondo no es válida; súbela de nuevo.';
+    } elseif ($imagen !== '' && medio_ruta($imagen) === null) {
+        $errores['imagen'] = 'La foto de fondo ya no existe; súbela de nuevo.';
     }
 
     $descripcion = $c['descripcion'] ?? '';
@@ -217,7 +239,11 @@ function validar_contenido_servicio(mixed $c): array
         }
     }
 
-    return [['descripcion' => $descripcion, 'tarjetas' => $limpias], $errores];
+    $limpio = ['descripcion' => $descripcion, 'tarjetas' => $limpias];
+    if ($imagen !== '') {
+        $limpio['imagen'] = $imagen;
+    }
+    return [$limpio, $errores];
 }
 
 /**
