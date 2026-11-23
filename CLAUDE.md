@@ -59,18 +59,18 @@ src/
   lib/api/admin-servicios.ts   # Cliente de /api/admin/servicios.php
   lib/api/*.mock.ts            # Mocks DEV (import dinámico)
   contexts/AuthContext.tsx     # Sesión real contra /api/auth/*; usuario y csrfToken en memoria
-  components/admin/            # AdminLayout, AdminSidebar, AdminNavbar, ProtectedRoute
+  components/admin/            # AdminLayout, AdminSidebar, AdminNavbar, ProtectedRoute, ContenidosTabs, SelectorIcono
   components/Mantenimiento.tsx # Pantalla de mantenimiento
   pages/                       # Páginas públicas
   pages/ServicioDetalle.tsx    # Plantilla única de /servicios/:slug (inactivo o inexistente → 404)
-  pages/admin/                 # Login, Dashboard, Contactos (leads), Contenidos, Servicios, ServicioEditar
+  pages/admin/                 # Login, Dashboard, Contactos (leads), Contenidos, ContenidoInicio, Servicios, ServicioEditar
 public/api/
   config/env.php               # Carga .env
   config/db.php                # get_db_connection() singleton
   config/helpers.php           # json_response(), get_json_input() — mantener pequeño
   config/auth.php              # start_secure_session, check_auth, require_auth, validate_csrf_token, destroy_session
   config/cors.php              # Lista blanca de orígenes + X-CSRF-Token
-  config/contenidos.php        # CMS: esquema de secciones, validar_contenido(), obtener_contenido()
+  config/contenidos.php        # CMS: esquema de secciones (global, inicio), validar_contenido(), obtener_contenido()
   config/servicios.php         # Íconos y temas permitidos, validar_servicio_patch(), servicio_desde_fila()
   auth/{login,logout,me}.php
   contactos.php                # POST público del formulario
@@ -92,14 +92,22 @@ Solo cubre las rutas públicas: `/admin/*` sigue accesible en producción.
 Patrón: **campos controlados + listas editables**. Nada de editor de bloques libre.
 
 1. **Esquema (servidor):** sección y campos en `contenidos_schema()` de `public/api/config/contenidos.php`.
-   Tipos: `email`, `telefono`, `whatsapp`, `url` (solo https), `texto` (una línea), `multilinea`.
-   Todos son texto; vacío = no mostrar. Campos desconocidos → 400.
+   Tipos: `email`, `telefono`, `whatsapp`, `url` (solo https), `texto` (una línea), `multilinea`,
+   `icono` (lista permitida), `slug` y `lista` (min/max elementos, cada uno con sus propios campos;
+   errores en `<campo>.<i>.<subcampo>`). Vacío = no mostrar. Campos desconocidos → 400.
 2. **Tipos:** interfaz en `src/types/api.ts` y la sección en `ContenidoSeccion`.
 3. **Respaldo:** valores por defecto en `src/lib/contenidos.ts`. El sitio **nunca** queda en blanco:
    si la API falla o la sección no se ha guardado, se muestra el respaldo.
 4. **Sitio:** el componente lee con un hook de `src/lib/contenidos.ts` (react-query, clave `["contenido", seccion]`).
 5. **Panel:** formulario con react-hook-form + zod que refleja las reglas del servidor (el servidor decide);
-   al guardar, invalidar la clave de react-query. Roles: viewer solo lectura.
+   al guardar, invalidar la clave de react-query. Roles: viewer solo lectura. Nueva sección → pestaña en `ContenidosTabs`.
+
+**Inicio:** las tarjetas de especialidades enlazan a un servicio por slug; si ese servicio está oculto (o no existe),
+la tarjeta no se muestra. Con la API caída se muestran todas las del respaldo.
+
+**Layout del panel:** `AdminLayout` usa `h-screen` y el `<main relative overflow-y-auto>` es el que hace scroll.
+No volver a `min-h-screen`: la barra de guardado `sticky bottom-0` dejaría de quedar fija y el clic en
+"Guardar" se pierde cuando aparece un error al salir del campo.
 
 **Servicios:** el diseño no es libre. El panel elige ícono y tema de listas cerradas que deben ser
 **idénticas** en `public/api/config/servicios.php` y en `src/lib/iconos.ts` / `src/lib/servicios.ts`.
@@ -169,7 +177,7 @@ Pruebas HTTP con `curl.exe` (no el alias `curl` de PowerShell) contra `http://lo
 | Hito | Contenido | Estado |
 |---|---|---|
 | H0 Línea base | Auth real, CSRF, sesiones, CORS, codificación, retiro de legado (PR #1, `47bb001`, 22/11) | ✅ Cerrado |
-| H1a CMS esencial | PR #2 contenidos globales (contacto, horario, redes, WhatsApp) · PR #3 servicios (plantilla única, edición, publicar/ocultar, selector en formulario) · PR #4 Inicio (banner y tarjetas) · PR #5 imágenes | En revisión: PR #2 y PR #3 |
+| H1a CMS esencial | PR #2 contenidos globales (contacto, horario, redes, WhatsApp) · PR #3 servicios (plantilla única, edición, publicar/ocultar, selector en formulario) · PR #4 Inicio (banner y tarjetas) · PR #5 imágenes | En revisión: PR #2, PR #3 y PR #4 |
 | H1b CMS resto | Quiénes Somos, Nuestro Equipo, Decálogo, Mercados, Qué Gestionamos | Pendiente |
 | H2 CRM de leads | CRUD, estados, responsables, notas, próximas acciones, historial, borrado solo admin | Pendiente |
 | H3 Cotizaciones/PDF | Cotizaciones ligadas a leads, conceptos, cálculos, estados, PDF corporativo | Pendiente |
@@ -185,6 +193,8 @@ Pendientes menores detectados:
 - Barra lateral del panel oculta en móvil (`hidden md:flex`): sin navegación en pantallas pequeñas.
 - Etiqueta "PRÓXIMAMENTE" desbordada en la barra lateral; Dashboard con un segundo botón "Cerrar sesión".
 - Footer: formulario de newsletter sin funcionalidad.
-- Tarjetas de servicios en Inicio y en "¿Qué Gestionamos?" siguen fijas en el código (PR #4 / H1b).
+- Tarjetas de servicios en "¿Qué Gestionamos?" siguen fijas en el código (H1b).
+- Inicio: sección "Nuestros Aliados" (logos de empresas, cifras 50+/15+/98% y testimonios con nombre) sin
+  confirmar con el cliente; no es editable ni se tocó. Confirmar antes de retirar el mantenimiento.
 - La página de servicio tipo marca usa una imagen de Unsplash enlazada externamente (conviene alojarla).
 - Leads: paginación/filtros (M-03), consulta redundante de `fecha_registro` tras INSERT (M-01).
