@@ -89,7 +89,7 @@ export type LogoutResponse = ApiResponse<never>;
 // ── CMS: contenidos editables (tabla `contenidos`) ────────────────────────────
 // Campos definidos en public/api/config/contenidos.php. Todos son texto; vacío = no mostrar.
 
-export type ContenidoSeccion = 'global';
+export type ContenidoSeccion = 'global' | 'inicio';
 
 export interface ContenidoGlobal {
   email: string;
@@ -104,6 +104,32 @@ export interface ContenidoGlobal {
   linkedin: string;
   facebook: string;
   instagram: string;
+}
+
+export interface EspecialidadInicio {
+  titulo: string;
+  descripcion: string;
+  /** Nombre de ícono de la lista permitida */
+  icono: string;
+  /** Slug del servicio al que enlaza la tarjeta */
+  servicio: string;
+}
+
+/** Sección `inicio`: banner, especialidades y llamada final de la página de inicio */
+export interface ContenidoInicio {
+  hero_antetitulo: string;
+  hero_titulo: string;
+  hero_titulo_destacado: string;
+  hero_descripcion: string;
+  hero_boton_principal: string;
+  hero_boton_secundario: string;
+  especialidades_titulo: string;
+  especialidades_destacado: string;
+  especialidades_descripcion: string;
+  especialidades: EspecialidadInicio[];
+  cta_titulo: string;
+  cta_descripcion: string;
+  cta_boton: string;
 }
 
 /** GET /api/contenidos.php — `datos` puede venir parcial o vacío si nunca se guardó */
