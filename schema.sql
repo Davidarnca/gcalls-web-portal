@@ -198,6 +198,34 @@ CREATE TABLE IF NOT EXISTS cotizaciones (
 
 
 -- =============================================================================
+-- TABLA: contenidos  (H1a — migrations/2026-11-22_h1a_contenidos.sql)
+-- =============================================================================
+-- Contenido editable del sitio publico desde el panel, una fila por seccion.
+-- Los campos permitidos y su validacion viven en public/api/config/contenidos.php.
+-- Sin datos iniciales: el sitio usa valores de respaldo hasta el primer guardado.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS contenidos (
+  seccion         VARCHAR(50)   NOT NULL                COMMENT 'Clave de la seccion editable -- ej: global',
+  datos           JSON          NOT NULL                COMMENT 'Contenido validado de la seccion',
+  actualizado_en  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                                                        COMMENT 'Fecha y hora de la ultima edicion',
+  actualizado_por INT UNSIGNED  NULL DEFAULT NULL       COMMENT 'Usuario que hizo la ultima edicion (FK a usuarios.id)',
+
+  PRIMARY KEY (seccion),
+
+  CONSTRAINT fk_contenidos_usuario
+    FOREIGN KEY (actualizado_por)
+    REFERENCES usuarios (id)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE
+
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci
+  COMMENT='Contenido editable del sitio publico, una fila por seccion';
+
+
+-- =============================================================================
 -- PROCEDIMIENTO AUXILIAR: gcalls_add_index
 -- =============================================================================
 -- Crea un indice solo si no existe, consultando information_schema.STATISTICS.
