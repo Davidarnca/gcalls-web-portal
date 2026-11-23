@@ -21,6 +21,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ErrorApi, actualizarServicio, listarServiciosAdmin } from "@/lib/api/admin-servicios";
 import { NOMBRES_ICONOS } from "@/lib/iconos";
 import SelectorIcono from "@/components/admin/SelectorIcono";
+import CampoImagen from "@/components/admin/CampoImagen";
 import {
   CLAVE_SERVICIOS,
   NOMBRES_TEMAS,
@@ -52,6 +53,7 @@ const esquema = z.object({
   icono: z.string().refine((v) => NOMBRES_ICONOS.includes(v), "Elige un ícono de la lista."),
   tema: z.string().refine((v) => (NOMBRES_TEMAS as string[]).includes(v), "Elige un tema."),
   descripcion: z.string().trim().min(1, "La descripción no puede quedar vacía.").max(1500, "Máximo 1500 caracteres."),
+  imagen: z.string(),
   tarjetas: z
     .array(
       z.object({
@@ -78,12 +80,13 @@ const aFormulario = (s: ReturnType<typeof completarServicio>): Formulario => ({
   icono: s.icono,
   tema: s.tema,
   descripcion: s.contenido.descripcion,
+  imagen: s.contenido.imagen ?? "",
   tarjetas: s.contenido.tarjetas.map((t) => ({ titulo: t.titulo, icono: t.icono, itemsTexto: t.items.join("\n") })),
 });
 
 /** Convierte las claves de error de la API (ej. "tarjetas.0.items") en rutas del formulario. */
 const rutaFormulario = (clave: string): string | null => {
-  if (["titulo", "icono", "tema", "descripcion"].includes(clave)) return clave;
+  if (["titulo", "icono", "tema", "descripcion", "imagen"].includes(clave)) return clave;
   const m = clave.match(/^tarjetas\.(\d+)\.(titulo|icono|items)$/);
   if (m) return `tarjetas.${m[1]}.${m[2] === "items" ? "itemsTexto" : m[2]}`;
   return null;
@@ -106,7 +109,7 @@ const AdminServicioEditar: React.FC = () => {
   const form = useForm<Formulario>({
     resolver: zodResolver(esquema),
     mode: "onTouched",
-    defaultValues: { titulo: "", icono: "Briefcase", tema: "marca", descripcion: "", tarjetas: [] },
+    defaultValues: { titulo: "", icono: "Briefcase", tema: "marca", descripcion: "", imagen: "", tarjetas: [] },
   });
   const { register, control, handleSubmit, reset, setError: setFieldError, formState, watch } = form;
   const tarjetas = useFieldArray({ control, name: "tarjetas" });
@@ -158,6 +161,7 @@ const AdminServicioEditar: React.FC = () => {
           tema: valores.tema as ServicioTema,
           contenido: {
             descripcion: valores.descripcion.trim(),
+            imagen: valores.imagen,
             tarjetas: valores.tarjetas.map((t) => ({
               titulo: t.titulo.trim(),
               icono: t.icono,
@@ -323,6 +327,24 @@ const AdminServicioEditar: React.FC = () => {
                   {errores.descripcion?.message ?? "Texto del recuadro central. Cada salto de línea crea un párrafo."}
                 </p>
               </div>
+
+              <Controller
+                control={control}
+                name="imagen"
+                render={({ field }) => (
+                  <CampoImagen
+                    id="imagen"
+                    etiqueta="Foto de fondo (opcional)"
+                    uso="foto"
+                    valor={field.value}
+                    onChange={(nombre) => field.onChange(nombre)}
+                    respaldo={null}
+                    textoRespaldo="Sin foto: el encabezado usa solo los colores del tema."
+                    deshabilitado={!puedeEditar || isSaving}
+                    error={errores.imagen?.message}
+                  />
+                )}
+              />
             </section>
 
             {/* Tarjetas */}

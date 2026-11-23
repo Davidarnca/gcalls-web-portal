@@ -12,6 +12,7 @@ import { completarServicio } from "@/lib/servicios";
 import type { ContenidoAdminResponse, ContenidoInicio, ServicioAdminApi } from "@/types/api";
 import ContenidosTabs from "@/components/admin/ContenidosTabs";
 import SelectorIcono from "@/components/admin/SelectorIcono";
+import CampoImagen from "@/components/admin/CampoImagen";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,6 +31,7 @@ const texto = (max: number) =>
 const multilinea = (max: number) => z.string().max(max, `Máximo ${max} caracteres.`);
 
 const esquema = z.object({
+  hero_imagen: z.string(),
   hero_antetitulo: texto(60),
   hero_titulo: texto(80),
   hero_titulo_destacado: texto(80),
@@ -283,6 +285,25 @@ const AdminContenidoInicio: React.FC = () => {
             <section className="bg-white rounded-lg border shadow-sm p-6">
               <h2 className="text-lg font-semibold text-slate-800">Banner principal</h2>
               <p className="text-sm text-muted-foreground mb-5">La primera pantalla del sitio.</p>
+              <div className="mb-6">
+                <Controller
+                  control={control}
+                  name="hero_imagen"
+                  render={({ field }) => (
+                    <CampoImagen
+                      id="hero_imagen"
+                      etiqueta="Foto de fondo (opcional)"
+                      uso="foto"
+                      valor={field.value}
+                      onChange={(nombre) => field.onChange(nombre)}
+                      respaldo={null}
+                      textoRespaldo="Sin foto: el banner muestra solo el degradado verde y azul."
+                      deshabilitado={!puedeEditar || isSaving}
+                      error={errores.hero_imagen?.message}
+                    />
+                  )}
+                />
+              </div>
               <div className="grid md:grid-cols-2 gap-x-6 gap-y-5">{BANNER.map(campoSimple)}</div>
             </section>
 
