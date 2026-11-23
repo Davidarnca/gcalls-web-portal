@@ -30,15 +30,17 @@ const MEDIOS_USOS = [
     'favicon'   => ['ancho' => 192,  'alto' => 192,  'formato' => 'png',  'recorte' => false, 'cuadrado' => true],
     // Vista previa al compartir (WhatsApp, LinkedIn, Facebook): 1200 x 630, JPG.
     'compartir' => ['ancho' => 1200, 'alto' => 630,  'formato' => 'jpg',  'recorte' => true],
-    // Fotos de fondo (banner, servicios) y futuras fotos de equipo.
+    // Fotos de fondo (banner, servicios).
     'foto'      => ['ancho' => 2400, 'alto' => 2400, 'formato' => 'webp', 'recorte' => false],
+    // Fotos de personas (Nuestro Equipo): cuadradas, recortadas al centro; el sitio las muestra en círculo.
+    'retrato'   => ['ancho' => 800,  'alto' => 800,  'formato' => 'webp', 'recorte' => true],
 ];
 
 const MEDIOS_MAX_BYTES       = 5 * 1024 * 1024;  // tamaño del archivo recibido
 const MEDIOS_MAX_LADO        = 8000;              // píxeles por lado del original
 const MEDIOS_MAX_MEGAPIXELES = 40;                // evita "bombas" de descompresión
 const MEDIOS_MIME            = ['image/jpeg', 'image/png', 'image/webp'];
-const MEDIOS_PATRON          = '/^(logo|favicon|compartir|foto)-[a-f0-9]{32}\.(webp|png|jpg)$/';
+const MEDIOS_PATRON          = '/^(logo|favicon|compartir|foto|retrato)-[a-f0-9]{32}\.(webp|png|jpg)$/';
 const MEDIOS_CONTENT_TYPE    = ['webp' => 'image/webp', 'png' => 'image/png', 'jpg' => 'image/jpeg'];
 
 /** Bytes de una directiva de php.ini ("2M", "512K", "8388608"). */
