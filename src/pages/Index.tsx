@@ -16,6 +16,7 @@ import { Fragment, useRef, useState, useEffect, useCallback } from "react";
 import { lineas, useContenidoInicio } from "@/lib/contenidos";
 import { icono } from "@/lib/iconos";
 import { rutaServicio, useServicios } from "@/lib/servicios";
+import { urlMedio } from "@/lib/medios";
 
 /** Texto multilínea dentro de un mismo párrafo, con <br /> entre renglones. */
 const ConSaltos = ({ texto }: { texto: string }) => (
@@ -48,6 +49,7 @@ const Index = () => {
 
   // Contenido editable desde el panel (Contenidos → Página de inicio)
   const inicio = useContenidoInicio();
+  const fotoBanner = urlMedio(inicio.hero_imagen);
   const { servicios, estado: estadoServicios } = useServicios();
 
   // Una tarjeta solo se muestra si su servicio está publicado. Mientras carga o si la
@@ -74,6 +76,13 @@ const Index = () => {
   return (
     <>      {/* Hero Section */}
       <section className="relative w-full h-screen flex items-center justify-center overflow-hidden gradient-primary">
+        {/* Foto de fondo opcional (panel → Página de inicio), cubierta con el degradado de marca para que el texto se lea */}
+        {fotoBanner && (
+          <>
+            <img src={fotoBanner} alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover" />
+            <div className="absolute inset-0 gradient-primary opacity-70" />
+          </>
+        )}
         <div className="absolute inset-0 opacity-10" style={{ transform: `translateY(${scrollY * 0.3}px)` }}>
           <div className="absolute inset-0 animate-gradient-shift" 
             style={{

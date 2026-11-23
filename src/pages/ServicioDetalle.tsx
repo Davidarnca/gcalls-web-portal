@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { icono } from "@/lib/iconos";
 import { LUCES, TEMAS, useServicios } from "@/lib/servicios";
+import { urlMedio } from "@/lib/medios";
 import NotFound from "./NotFound";
 
 /**
@@ -31,6 +32,8 @@ const ServicioDetalle = () => {
   if (!servicio) return <NotFound />;
 
   const tema = TEMAS[servicio.tema];
+  // Foto de fondo opcional subida desde el panel (Servicios → Editar)
+  const foto = urlMedio(servicio.contenido.imagen);
   const IconoPrincipal = icono(servicio.icono);
 
   return (
@@ -42,14 +45,11 @@ const ServicioDetalle = () => {
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-gradient-to-br from-[#0e7734] via-[#2b358e] to-[#1a237e] z-10 opacity-95" />
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#e84e1b]/10 blur-[120px] rounded-full z-10" />
-          <img
-            src="https://images.unsplash.com/photo-1586528116311-ad8ed7c80a30?q=80&w=2070"
-            alt=""
-            className="w-full h-full object-cover opacity-20 mix-blend-overlay"
-          />
+          {foto && <img src={foto} alt="" className="w-full h-full object-cover opacity-20 mix-blend-overlay" />}
         </div>
       ) : (
         <>
+          {foto && <img src={foto} alt="" className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none" />}
           <div className={`absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] ${LUCES[servicio.tema][0]} blur-[130px] rounded-full pointer-events-none`} />
           <div className={`absolute bottom-10 right-10 w-[400px] h-[400px] ${LUCES[servicio.tema][1]} blur-[120px] rounded-full pointer-events-none`} />
         </>

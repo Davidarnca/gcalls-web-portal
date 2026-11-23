@@ -87,9 +87,36 @@ export type LogoutResponse = ApiResponse<never>;
 
 
 // ── CMS: contenidos editables (tabla `contenidos`) ────────────────────────────
-// Campos definidos en public/api/config/contenidos.php. Todos son texto; vacío = no mostrar.
+// Campos definidos en public/api/config/contenidos.php. Todos son texto; vacío = no mostrar
+// (en las imágenes, vacío = imagen por defecto).
 
-export type ContenidoSeccion = 'global' | 'inicio';
+export type ContenidoSeccion = 'global' | 'inicio' | 'identidad';
+
+/** Usos de imagen aceptados por /api/admin/medios.php (definen tamaño y formato) */
+export type UsoImagen = 'logo' | 'favicon' | 'compartir' | 'foto';
+
+/** POST /api/admin/medios.php */
+export interface MedioSubido {
+  /** Nombre que se guarda en el contenido, ej. foto-<32 hex>.webp */
+  archivo: string;
+  ancho: number;
+  alto: number;
+  bytes: number;
+}
+
+export type MedioSubidoResponse = ApiResponse<MedioSubido>;
+
+/** Sección `identidad`: logos e imágenes de marca. Vacío = la imagen original del sitio. */
+export interface ContenidoIdentidad {
+  /** Logo del menú superior y de la pantalla de mantenimiento (uso logo) */
+  logo: string;
+  /** Logo del pie de página (uso logo) */
+  logo_pie: string;
+  /** Ícono de la pestaña del navegador (uso favicon) */
+  favicon: string;
+  /** Vista previa al compartir el sitio en WhatsApp o redes (uso compartir) */
+  compartir: string;
+}
 
 export interface ContenidoGlobal {
   email: string;
@@ -117,6 +144,8 @@ export interface EspecialidadInicio {
 
 /** Sección `inicio`: banner, especialidades y llamada final de la página de inicio */
 export interface ContenidoInicio {
+  /** Foto de fondo del banner (uso foto). Vacío = solo el degradado de marca */
+  hero_imagen: string;
   hero_antetitulo: string;
   hero_titulo: string;
   hero_titulo_destacado: string;
@@ -162,6 +191,8 @@ export interface ServicioTarjeta {
 export interface ServicioContenido {
   descripcion: string;
   tarjetas: ServicioTarjeta[];
+  /** Foto de fondo del encabezado (uso foto). Ausente = sin foto */
+  imagen?: string;
 }
 
 /** Servicio tal como lo entrega la API. null = usar respaldo del frontend. */
