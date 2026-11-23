@@ -4,6 +4,7 @@ import { NavLink } from "react-router-dom";
 const PESTAÑAS = [
   { nombre: "Datos de contacto y redes", ruta: "/admin/contenidos", end: true },
   { nombre: "Página de inicio", ruta: "/admin/contenidos/inicio", end: false },
+  { nombre: "Nuestro Equipo", ruta: "/admin/contenidos/equipo", end: false },
   { nombre: "Identidad", ruta: "/admin/contenidos/identidad", end: false },
 ];
 
