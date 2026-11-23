@@ -44,8 +44,10 @@ descargas. No volver a conectarlo. El backend Node/Express de correo también se
 - API: `php -S localhost:8000 -t public/api` → http://localhost:8000
 - Proxy Vite: `/api/*` → `localhost:8000` **quitando el prefijo `/api`**.
 - MySQL: servicio Windows `MySQL267`, puerto 3306, base `gcalls_db`.
-- Migraciones: `mysql -u root -p gcalls_db -e "source migrations/<archivo>.sql"` (no usar `Get-Content |`,
-  PowerShell puede alterar la codificación).
+- Migraciones: entrar al cliente con `mysql -u root -p --default-character-set=utf8mb4 gcalls_db` y, ya en el
+  prompt `mysql>`, ejecutar `source migrations/<archivo>.sql`. `source` es un comando del cliente: con `-e`
+  falla con error 1064. No usar `Get-Content |` (PowerShell puede alterar la codificación).
+  Antes de migrar: respaldo con `mysqldump ... --result-file=<ruta fuera del repo>` (no usar `>`).
 - Mock de leads: `VITE_USE_MOCK_LEADS=true` usa `src/lib/api/admin-contactos.mock.ts`.
 
 ## Estructura clave
