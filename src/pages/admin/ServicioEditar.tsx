@@ -19,7 +19,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ErrorApi, actualizarServicio, listarServiciosAdmin } from "@/lib/api/admin-servicios";
-import { NOMBRES_ICONOS, icono } from "@/lib/iconos";
+import { NOMBRES_ICONOS } from "@/lib/iconos";
+import SelectorIcono from "@/components/admin/SelectorIcono";
 import {
   CLAVE_SERVICIOS,
   NOMBRES_TEMAS,
@@ -34,7 +35,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/components/ui/sonner";
 
 // ── Validación en el navegador (refleja public/api/config/servicios.php) ─────
@@ -87,40 +87,6 @@ const rutaFormulario = (clave: string): string | null => {
   const m = clave.match(/^tarjetas\.(\d+)\.(titulo|icono|items)$/);
   if (m) return `tarjetas.${m[1]}.${m[2] === "items" ? "itemsTexto" : m[2]}`;
   return null;
-};
-
-// ── Selector de ícono con vista previa ───────────────────────────────────────
-
-const SelectorIcono: React.FC<{ id: string; value: string; onChange: (v: string) => void; disabled?: boolean }> = ({
-  id,
-  value,
-  onChange,
-  disabled,
-}) => {
-  const Actual = icono(value);
-  return (
-    <Select value={value} onValueChange={onChange} disabled={disabled}>
-      <SelectTrigger id={id} className="w-full">
-        <SelectValue placeholder="Elige un ícono">
-          <span className="flex items-center gap-2">
-            <Actual className="h-4 w-4" /> {value}
-          </span>
-        </SelectValue>
-      </SelectTrigger>
-      <SelectContent className="max-h-72">
-        {NOMBRES_ICONOS.map((nombre) => {
-          const I = icono(nombre);
-          return (
-            <SelectItem key={nombre} value={nombre}>
-              <span className="flex items-center gap-2">
-                <I className="h-4 w-4" /> {nombre}
-              </span>
-            </SelectItem>
-          );
-        })}
-      </SelectContent>
-    </Select>
-  );
 };
 
 // ── Página ───────────────────────────────────────────────────────────────────
