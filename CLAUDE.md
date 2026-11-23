@@ -194,7 +194,8 @@ Pendientes menores detectados:
 - Etiqueta "PRÓXIMAMENTE" desbordada en la barra lateral; Dashboard con un segundo botón "Cerrar sesión".
 - Footer: formulario de newsletter sin funcionalidad.
 - Tarjetas de servicios en "¿Qué Gestionamos?" siguen fijas en el código (H1b).
-- Inicio: sección "Nuestros Aliados" (logos de empresas, cifras 50+/15+/98% y testimonios con nombre) sin
-  confirmar con el cliente; no es editable ni se tocó. Confirmar antes de retirar el mantenimiento.
+- Inicio: la sección "Nuestros Aliados" (empresas, cifras y testimonios) se retiró por no ser real (PR #4).
+  Volverá como sección editable cuando el cliente entregue datos reales y autorización de uso de logos y testimonios.
+- Nuestro Equipo: 4 personas con fotos de stock y LinkedIn "#"; confirmar con el cliente si son reales (H1b).
 - La página de servicio tipo marca usa una imagen de Unsplash enlazada externamente (conviene alojarla).
 - Leads: paginación/filtros (M-03), consulta redundante de `fecha_registro` tras INSERT (M-01).
