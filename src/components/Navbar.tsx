@@ -4,12 +4,14 @@ import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.svg";
 import logoWhite from "@/assets/logo-white.svg";
+import { rutaServicio, useServicios } from "@/lib/servicios";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({});
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const { servicios } = useServicios();
 
   const isHomePage = location.pathname === "/";
 
@@ -41,12 +43,8 @@ const Navbar = () => {
       name: "¿Qué Gestionamos?",
       path: "/que-gestionamos",
       submenu: [
-        { name: "Cadena de Abastecimiento Inteligente", path: "/servicios/supply-chain-management" },
-        { name: "Gestión Ambiental y Sostenibilidad (ESG)", path: "/servicios/gestion-ambiental-sostenibilidad" },
-        { name: "Seguridad y Salud en el Trabajo (SST)", path: "/servicios/seguridad-salud-trabajo" },
-        { name: "Gestión del Talento Humano y Relaciones Laborales", path: "/servicios/gestion-talento-humano" },
-        { name: "Gestión Social y Sostenibilidad (ESG)", path: "/servicios/gestion-social-rse" },
-        { name: "Gobernanza y Gestión Legal", path: "/servicios/asesoria-legal" },
+        // Servicios activos, administrados desde el panel (Servicios)
+        ...servicios.map((s) => ({ name: s.titulo, path: rutaServicio(s.slug) })),
       ],
       submenuWidth: "w-[24rem]"
     },

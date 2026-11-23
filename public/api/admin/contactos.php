@@ -50,17 +50,19 @@ try {
 
     $sql = <<<SQL
         SELECT
-            id,
-            nombre,
-            empresa,
-            email,
-            telefono,
-            servicio_interes,
-            mensaje,
-            estado,
-            fecha_registro
-        FROM contactos_leads
-        ORDER BY fecha_registro DESC
+            l.id,
+            l.nombre,
+            l.empresa,
+            l.email,
+            l.telefono,
+            l.servicio_interes,
+            s.titulo AS servicio_titulo,
+            l.mensaje,
+            l.estado,
+            l.fecha_registro
+        FROM contactos_leads l
+        LEFT JOIN servicios s ON s.id = l.servicio_interes
+        ORDER BY l.fecha_registro DESC, l.id DESC
         LIMIT 200
     SQL;
 
@@ -82,6 +84,7 @@ try {
             'servicio_interes' => $row['servicio_interes'] !== null
                                     ? (int) $row['servicio_interes']
                                     : null,                  // int|null
+            'servicio_titulo'  => $row['servicio_titulo'],   // string|null (M-04)
             'mensaje'          => $row['mensaje'],           // string|null
             'estado'           => $row['estado'],
             'fecha_registro'   => $row['fecha_registro'],    // 'YYYY-MM-DD HH:MM:SS'

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ import {
   ubicacion,
   useContenidoGlobal,
 } from "@/lib/contenidos";
+import { useServicios } from "@/lib/servicios";
 
 // URL del endpoint PHP — el proxy de Vite redirige /api → servidor PHP en dev
 const API_URL = "/api/contactos.php";
@@ -43,7 +45,24 @@ const Contactos = () => {
     phone: "",
     company: "",
     message: "",
+    service: "",
   });
+
+  // Servicios activos para el selector. Si la API no responde no hay ids
+  // confiables, así que el selector se oculta.
+  const { servicios, estado: estadoServicios } = useServicios();
+  const mostrarSelectorServicio = estadoServicios === "api" && servicios.length > 0;
+  const [searchParams] = useSearchParams();
+  const servicioEnUrl = searchParams.get("servicio");
+
+  // Preselecciona el servicio si se llegó desde su página (/contactos?servicio=slug)
+  useEffect(() => {
+    if (!servicioEnUrl || estadoServicios !== "api") return;
+    const elegido = servicios.find((s) => s.slug === servicioEnUrl);
+    if (elegido?.id) {
+      setFormData((prev) => (prev.service ? prev : { ...prev, service: String(elegido.id) }));
+    }
+  }, [servicioEnUrl, estadoServicios, servicios]);
 
   // Estado de validación por campo — muestra errores devueltos por la API
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -54,6 +73,7 @@ const Contactos = () => {
     phone: "",
     company: "",
     message: "",
+    service: "",
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -68,6 +88,7 @@ const Contactos = () => {
       empresa: formData.company.trim(),
       telefono: formData.phone.trim(),
       mensaje: formData.message.trim(),
+      ...(formData.service ? { servicio_interes: Number(formData.service) } : {}),
     };
 
     try {
@@ -121,7 +142,7 @@ const Contactos = () => {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -372,6 +393,33 @@ const Contactos = () => {
                       )}
                     </div>
                   </div>
+
+                  {/* Servicio de interés (opcional) */}
+                  {mostrarSelectorServicio && (
+                    <div>
+                      <label
+                        htmlFor="service"
+                        className="block text-sm font-medium mb-2"
+                      >
+                        Servicio de interés
+                      </label>
+                      <select
+                        id="service"
+                        name="service"
+                        value={formData.service}
+                        onChange={handleChange}
+                        aria-invalid={!!fieldErrors.servicio_interes}
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all duration-300 focus:shadow-soft"
+                      >
+                        <option value="">General / no estoy seguro</option>
+                        {servicios.map((servicio) => (
+                          <option key={servicio.slug} value={String(servicio.id)}>
+                            {servicio.titulo}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
 
                   {/* Mensaje */}
                   <div>
