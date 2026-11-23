@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Users } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
@@ -31,9 +31,7 @@ const ConSaltos = ({ texto }: { texto: string }) => (
 
 const Index = () => {
   const [featuresApi, setFeaturesApi] = useState<CarouselApi>();
-  const [testimonialsApi, setTestimonialsApi] = useState<CarouselApi>();
   const [featuresCurrentSlide, setFeaturesCurrentSlide] = useState(0);
-  const [testimonialsCurrentSlide, setTestimonialsCurrentSlide] = useState(0);
   const [scrollY, setScrollY] = useState(0);
 
   const autoplayPlugin = useRef(
@@ -64,11 +62,6 @@ const Index = () => {
     setFeaturesCurrentSlide(featuresApi.selectedScrollSnap());
   }, [featuresApi]);
 
-  const onTestimonialsSelect = useCallback(() => {
-    if (!testimonialsApi) return;
-    setTestimonialsCurrentSlide(testimonialsApi.selectedScrollSnap());
-  }, [testimonialsApi]);
-
   useEffect(() => {
     if (!featuresApi) return;
     onFeaturesSelect();
@@ -77,15 +70,6 @@ const Index = () => {
       featuresApi.off("select", onFeaturesSelect);
     };
   }, [featuresApi, onFeaturesSelect]);
-
-  useEffect(() => {
-    if (!testimonialsApi) return;
-    onTestimonialsSelect();
-    testimonialsApi.on("select", onTestimonialsSelect);
-    return () => {
-      testimonialsApi.off("select", onTestimonialsSelect);
-    };
-  }, [testimonialsApi, onTestimonialsSelect]);
 
   return (
     <>      {/* Hero Section */}
@@ -216,155 +200,6 @@ const Index = () => {
           </div>
         </section>
       )}
-
-      {/* Clients Section - Redesigned */}
-      <section className="py-24 bg-gradient-to-b from-background via-secondary/20 to-background relative overflow-hidden">
-        {/* Decorative Elements */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
-        
-        <div className="container mx-auto px-4 lg:px-8 relative z-10">
-          <div className="text-center mb-16 animate-fade-in">
-            <div className="inline-block px-4 py-2 bg-primary/10 rounded-full mb-6">
-              <p className="text-sm font-semibold text-primary">Nuestros Aliados</p>
-            </div>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 tracking-tight">
-              Empresas que <span className="text-gradient">Transforman con Nosotros</span>
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-[1.6]">
-              Más de 50+ empresas líderes confían en nuestras soluciones para alcanzar 
-              sus objetivos de sostenibilidad y excelencia operacional.
-            </p>
-          </div>
-
-          {/* Stats Banner */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-            <div className="text-center p-8 rounded-2xl bg-card border border-border hover:border-primary/50 transition-all duration-300">
-              <div className="text-4xl md:text-5xl font-bold text-gradient mb-2">50+</div>
-              <p className="text-muted-foreground">Clientes Activos</p>
-            </div>
-            <div className="text-center p-8 rounded-2xl bg-card border border-border hover:border-primary/50 transition-all duration-300">
-              <div className="text-4xl md:text-5xl font-bold text-gradient mb-2">15+</div>
-              <p className="text-muted-foreground">Años de Experiencia</p>
-            </div>
-            <div className="text-center p-8 rounded-2xl bg-card border border-border hover:border-primary/50 transition-all duration-300">
-              <div className="text-4xl md:text-5xl font-bold text-gradient mb-2">98%</div>
-              <p className="text-muted-foreground">Satisfacción del Cliente</p>
-            </div>
-          </div>
-
-          {/* Client Logos Grid */}
-          <div className="mb-16">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              {[
-                "Ecopetrol",
-                "Cementos Argos",
-                "Grupo Nutresa",
-                "ISA",
-                "Bancolombia",
-                "Corona",
-                "Celsia",
-                "Postobón"
-              ].map((client, index) => (
-                <div 
-                  key={index} 
-                  className="group relative p-8 rounded-xl bg-card border border-border hover:border-primary/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg flex items-center justify-center h-32"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-primary/10 rounded-xl transition-all duration-300"></div>
-                  <p className="relative text-base md:text-lg font-bold text-muted-foreground group-hover:text-primary transition-colors duration-200">
-                    {client}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Testimonials Carousel */}
-          <div className="max-w-4xl mx-auto">
-            <Carousel
-              opts={{
-                align: "start",
-                loop: true,
-              }}
-              setApi={setTestimonialsApi}
-              className="w-full"
-            >
-              <CarouselContent className="-ml-2 md:-ml-4">
-                {/* Testimonial 1 */}
-                <CarouselItem className="pl-2 md:pl-4 md:basis-1/2">
-                  <Card className="relative overflow-hidden border hover:border-primary/50 transition-all duration-300 h-full">
-                    <CardContent className="p-6">
-                      <div className="flex flex-col h-full">
-                        <div className="text-3xl text-primary mb-3 opacity-50">"</div>
-                        <p className="text-sm text-foreground mb-4 leading-relaxed italic flex-1">
-                          G-Calls S.A.S ha sido clave en nuestra transformación sostenible. Su expertise nos permitió superar regulaciones y convertirnos en referentes del sector.
-                        </p>
-                        <div className="flex items-center gap-3 mt-auto">
-                          <div className="w-12 h-12 rounded-full gradient-primary p-0.5">
-                            <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
-                              <Users className="text-primary" size={20} />
-                            </div>
-                          </div>
-                          <div>
-                            <p className="font-bold text-foreground text-sm">María González</p>
-                            <p className="text-muted-foreground text-xs">Dir. Sostenibilidad - Ecopetrol</p>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </CarouselItem>
-
-                {/* Testimonial 2 */}
-                <CarouselItem className="pl-2 md:pl-4 md:basis-1/2">
-                  <Card className="relative overflow-hidden border hover:border-primary/50 transition-all duration-300 h-full">
-                    <CardContent className="p-6">
-                      <div className="flex flex-col h-full">
-                        <div className="text-3xl text-primary mb-3 opacity-50">"</div>
-                        <p className="text-sm text-foreground mb-4 leading-relaxed italic flex-1">
-                          La implementación de sus soluciones en gestión ambiental mejoró significativamente nuestros procesos operativos y nos ayudó a alcanzar nuestros objetivos de responsabilidad social.
-                        </p>
-                        <div className="flex items-center gap-3 mt-auto">
-                          <div className="w-12 h-12 rounded-full gradient-primary p-0.5">
-                            <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
-                              <Users className="text-primary" size={20} />
-                            </div>
-                          </div>
-                          <div>
-                            <p className="font-bold text-foreground text-sm">Carlos Rodríguez</p>
-                            <p className="text-muted-foreground text-xs">Gerente de Operaciones - Cementos Argos</p>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </CarouselItem>
-              </CarouselContent>
-              
-              <CarouselPrevious className="hidden md:flex -left-12" />
-              <CarouselNext className="hidden md:flex -right-12" />
-              
-              {/* Dots indicators */}
-              <div className="flex justify-center gap-2 mt-8">
-                {[0, 1].map((index) => (
-                  <button
-                    key={index}
-                    onClick={() => testimonialsApi?.scrollTo(index)}
-                    className={`rounded-full transition-all duration-300 ${
-                      index === testimonialsCurrentSlide
-                        ? "w-3 h-3 bg-primary border-2 border-primary scale-110"
-                        : "w-2 h-2 bg-primary/30 border border-primary/40 hover:bg-primary/50"
-                    }`}
-                    aria-label={`Go to slide ${index + 1}`}
-                  />
-                ))}
-              </div>
-            </Carousel>
-          </div>
-        </div>
-      </section>
-
 
       {/* CTA Section */}
       <section className="py-24 gradient-primary relative overflow-hidden">
