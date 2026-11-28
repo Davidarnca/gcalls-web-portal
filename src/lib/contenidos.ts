@@ -1,10 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import type {
+  ContenidoDecalogo,
   ContenidoEquipo,
   ContenidoGlobal,
   ContenidoIdentidad,
   ContenidoInicio,
   ContenidoPublicoResponse,
+  ContenidoQuienesSomos,
   ContenidoSeccion,
 } from "@/types/api";
 
@@ -126,6 +128,73 @@ export const CONTENIDO_EQUIPO_DEFAULT: ContenidoEquipo = {
   cta_boton: "Contáctanos Ahora",
 };
 
+/**
+ * Quiénes Somos: textos originales de la página (misión, visión, valor y método).
+ * Los pasos se numeran en el sitio, por eso el título no lleva número ni dos puntos.
+ */
+export const CONTENIDO_QUIENES_SOMOS_DEFAULT: ContenidoQuienesSomos = {
+  encabezado_titulo: "¿Transformamos su negocio?",
+  encabezado_descripcion:
+    "Combinamos experiencia sectorial, analítica avanzada e inteligencia artificial para diseñar e implementar soluciones a la medida que optimizan el desempeño, fortalecen la competitividad y generan resultados tangibles y sostenibles.",
+  mision_titulo: "Nuestra Misión",
+  mision:
+    "Impulsamos la transformación sostenible de organizaciones de múltiples industrias, generando valor tangible mediante soluciones integrales en cadena de abastecimiento y gestión ambiental, laboral y legal, apalancadas en analítica avanzada, inteligencia artificial e innovación, para optimizar el desempeño, fortalecer la competitividad y asegurar un crecimiento responsable.",
+  vision_titulo: "Nuestra Visión",
+  vision:
+    "Ser la firma líder en Colombia y América Latina en transformación sostenible y gestión integral del negocio, reconocida por integrar inteligencia artificial, analítica y mejores prácticas de clase mundial, para generar impacto medible y relaciones de largo plazo.",
+  valor_titulo: "Cómo generamos valor",
+  valor:
+    "• Entendemos su negocio y sus retos\n• Analizamos datos con IA para identificar oportunidades\n• Diseñamos soluciones a la medida\n• Implementamos con foco en resultados\n• Aseguramos mejora continua",
+  metodo_titulo: "Cómo lo hacemos",
+  pasos: [
+    {
+      titulo: "Entendimiento estratégico",
+      descripcion:
+        "Analizamos a profundidad el negocio, su contexto y sus desafíos para identificar oportunidades reales de mejora y generación de valor.",
+    },
+    {
+      titulo: "Diagnóstico basado en datos",
+      descripcion:
+        "Utilizamos analítica avanzada e inteligencia artificial para evaluar procesos, identificar riesgos y descubrir oportunidades de optimización.",
+    },
+    {
+      titulo: "Diseño de soluciones a la medida",
+      descripcion:
+        "Estructuramos soluciones integrales alineadas con la estrategia del cliente, incorporando mejores prácticas de clase mundial.",
+    },
+    {
+      titulo: "Implementación con impacto",
+      descripcion: "Acompañamos la ejecución asegurando adopción, eficiencia operativa y resultados medibles.",
+    },
+    {
+      titulo: "Seguimiento y mejora continua",
+      descripcion: "Monitoreamos indicadores, ajustamos estrategias y garantizamos sostenibilidad en el tiempo.",
+    },
+  ],
+};
+
+/** Decálogo: textos originales. El sitio numera los principios (1., 2., 3.…). */
+export const CONTENIDO_DECALOGO_DEFAULT: ContenidoDecalogo = {
+  encabezado_titulo: "Así trabajamos con nuestros",
+  encabezado_destacado: "clientes",
+  encabezado_descripcion: "",
+  principios: [
+    { titulo: "Resultados medibles", descripcion: "Usamos datos e inteligencia artificial para generar impacto tangible." },
+    { titulo: "Decisiones basadas en datos", descripcion: "Transformamos información en ventajas competitivas." },
+    { titulo: "Innovación aplicada", descripcion: "Incorporamos IA y tecnologías emergentes en soluciones prácticas." },
+    { titulo: "Cercanía estratégica", descripcion: "Trabajamos como aliados del negocio." },
+    { titulo: "Excelencia operativa", descripcion: "Rigor técnico en cada entrega." },
+    { titulo: "Sostenibilidad integral", descripcion: "Impacto ambiental, social y económico." },
+    { titulo: "Ética y transparencia", descripcion: "Uso responsable de datos y tecnología." },
+    { titulo: "Talento aumentado", descripcion: "Combinamos experiencia humana con capacidades de IA." },
+    { titulo: "Mejora continua", descripcion: "Evolucionamos con aprendizaje constante." },
+  ],
+  boton_ver_todos: "Ver Todos los Principios",
+  propuesta_titulo: "Propuesta de Valor",
+  propuesta_texto:
+    "Integramos experiencia consultiva con inteligencia artificial y analítica avanzada para diseñar e implementar soluciones que optimizan la cadena de abastecimiento, fortalecen la gestión integral del negocio y generan resultados medibles en eficiencia, cumplimiento y sostenibilidad.",
+};
+
 /** Combina lo guardado con el respaldo, campo por campo (texto o listas). */
 export function combinarConRespaldo<T extends object>(
   respaldo: T,
@@ -183,6 +252,14 @@ export const useContenidoInicio = (): ContenidoInicio =>
 /** Página Nuestro Equipo. */
 export const useContenidoEquipo = (): ContenidoEquipo =>
   useContenido("equipo", CONTENIDO_EQUIPO_DEFAULT);
+
+/** Página Quiénes Somos. */
+export const useContenidoQuienesSomos = (): ContenidoQuienesSomos =>
+  useContenido("quienes_somos", CONTENIDO_QUIENES_SOMOS_DEFAULT);
+
+/** Página Decálogo. */
+export const useContenidoDecalogo = (): ContenidoDecalogo =>
+  useContenido("decalogo", CONTENIDO_DECALOGO_DEFAULT);
 
 /** Logos e imágenes de marca. */
 export const useContenidoIdentidad = (): ContenidoIdentidad =>

@@ -2,52 +2,13 @@ import { CheckCircle2, ChevronDown } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useContenidoDecalogo } from "@/lib/contenidos";
 
 const Decalogo = () => {
   const [showAll, setShowAll] = useState(false);
   
-  const principles = [
-    {
-      title: "Resultados medibles",
-      description: "Usamos datos e inteligencia artificial para generar impacto tangible.",
-    },
-    {
-      title: "Decisiones basadas en datos",
-      description: "Transformamos información en ventajas competitivas.",
-    },
-    {
-      title: "Innovación aplicada",
-      description: "Incorporamos IA y tecnologías emergentes en soluciones prácticas.",
-    },
-    {
-      title: "Cercanía estratégica",
-      description: "Trabajamos como aliados del negocio.",
-    },
-    {
-      title: "Excelencia operativa",
-      description: "Rigor técnico en cada entrega.",
-    },
-    {
-      title: "Sostenibilidad integral ",
-      description: "Impacto ambiental, social y económico.",
-    },
-    {
-      title: "Ética y transparencia",
-      description: "Uso responsable de datos y tecnología.",
-    },
-    {
-      title: "Talento aumentado",
-      description: "Combinamos experiencia humana con capacidades de IA.",
-    },
-    {
-      title: "Mejora continua",
-      description: "Evolucionamos con aprendizaje constante.",
-    },
-    // {
-    //   title: "Trabajo colaborativo",
-    //   description: "Integramos capacidades para entregar soluciones más completas y efectivas.",
-    // },
-  ];
+  const c = useContenidoDecalogo();
+  const principles = c.principios;
 
   const displayedPrinciples = showAll ? principles : principles.slice(0, 4);
 
@@ -57,11 +18,14 @@ const Decalogo = () => {
           {/* Header */}
           <div className="text-center mb-20 animate-fade-in">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight">
-              Así trabajamos con nuestros <span className="text-gradient">clientes</span>
+              {c.encabezado_titulo}{" "}
+              {c.encabezado_destacado && <span className="text-gradient">{c.encabezado_destacado}</span>}
             </h1>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-[1.6]">
-              {/* Así trabajamos con nuestros clientes. */}
-            </p>
+            {c.encabezado_descripcion && (
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-[1.6] whitespace-pre-line">
+                {c.encabezado_descripcion}
+              </p>
+            )}
           </div>
 
           {/* Principles Grid */}
@@ -80,10 +44,10 @@ const Decalogo = () => {
                   </div>
                   <div className="flex-1">
                     <h3 className="text-xl font-semibold mb-3 group-hover:text-primary transition-colors duration-200">
-                      {index + 1}. {principle.title}
+                      {index + 1}. {principle.titulo}
                     </h3>
                     <p className="text-muted-foreground leading-[1.6]">
-                      {principle.description}
+                      {principle.descripcion}
                     </p>
                   </div>
                 </div>
@@ -92,29 +56,31 @@ const Decalogo = () => {
           </div>
 
           {/* Show More Button */}
-          {!showAll && (
+          {!showAll && principles.length > 4 && (
             <div className="mt-12 text-center animate-fade-up">
               <Button
                 size="lg"
                 onClick={() => setShowAll(true)}
                 className="gradient-primary text-white hover:opacity-90 transition-opacity duration-200"
               >
-                Ver Todos los Principios
+                {c.boton_ver_todos}
                 <ChevronDown className="ml-2" size={20} />
               </Button>
             </div>
           )}
 
           {/* Bottom CTA */}
-          {showAll && (
+          {(showAll || principles.length <= 4) && (c.propuesta_titulo || c.propuesta_texto) && (
             <div className="mt-20 text-center animate-fade-up">
               <div className="inline-block p-10 rounded-2xl gradient-primary max-w-3xl">
-                <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 tracking-tight">
-                  Propuesta de Valor
-                </h3>
-                <p className="text-white/95 text-lg leading-[1.7]">
-                  Integramos experiencia consultiva con inteligencia artificial y analítica avanzada para diseñar e implementar soluciones que optimizan la cadena de abastecimiento, fortalecen la gestión integral del negocio y generan resultados medibles en eficiencia, cumplimiento y sostenibilidad.
-                </p>
+                {c.propuesta_titulo && (
+                  <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 tracking-tight">
+                    {c.propuesta_titulo}
+                  </h3>
+                )}
+                {c.propuesta_texto && (
+                  <p className="text-white/95 text-lg leading-[1.7] whitespace-pre-line">{c.propuesta_texto}</p>
+                )}
               </div>
             </div>
           )}

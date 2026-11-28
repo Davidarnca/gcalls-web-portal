@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
-import { Target, Eye, Award, Users, ChevronLeft, ChevronRight } from "lucide-react";
+import { Target, Eye, Award, Users, ChevronLeft, ChevronRight, type LucideIcon } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { useContenidoQuienesSomos } from "@/lib/contenidos";
 
 // 1. FUNCIÓN HIGHLIGHTER
 const highlightText = (text: string) => {
@@ -100,59 +101,39 @@ const StepCarousel = ({ items }: { items: { title: string, text: string }[] }) =
   );
 };
 
+type Tarjeta = { icon: LucideIcon; title: string } & (
+  | { description: string }
+  | { carouselItems: { title: string; text: string }[] }
+);
+
 const QuienesSomos = () => {
-  const values = [
-    {
-      icon: Target,
-      title: "Nuestra Misión",
-      description: "Impulsamos la transformación sostenible de organizaciones de múltiples industrias, generando valor tangible mediante soluciones integrales en cadena de abastecimiento y gestión ambiental, laboral y legal, apalancadas en analítica avanzada, inteligencia artificial e innovación, para optimizar el desempeño, fortalecer la competitividad y asegurar un crecimiento responsable."
-    },
-    {
-      icon: Eye,
-      title: "Nuestra Visión",
-      description: "Ser la firma líder en Colombia y América Latina en transformación sostenible y gestión integral del negocio, reconocida por integrar inteligencia artificial, analítica y mejores prácticas de clase mundial, para generar impacto medible y relaciones de largo plazo."
-    },
-    {
-      icon: Award,
-      title: "Cómo generamos valor",
-      description: "• Entendemos su negocio y sus retos\n• Analizamos datos con IA para identificar oportunidades\n• Diseñamos soluciones a la medida\n• Implementamos con foco en resultados\n• Aseguramos mejora continua"
-    },
-    {
+  const c = useContenidoQuienesSomos();
+
+  // Una tarjeta sin texto no se muestra; los pasos se numeran aquí
+  const values: Tarjeta[] = [];
+  if (c.mision) values.push({ icon: Target, title: c.mision_titulo, description: c.mision });
+  if (c.vision) values.push({ icon: Eye, title: c.vision_titulo, description: c.vision });
+  if (c.valor) values.push({ icon: Award, title: c.valor_titulo, description: c.valor });
+  if (c.pasos.length > 0) {
+    values.push({
       icon: Users,
-      title: "Cómo lo hacemos",
-      carouselItems: [
-        { 
-          title: "1. Entendimiento estratégico:", 
-          text: "Analizamos a profundidad el negocio, su contexto y sus desafíos para identificar oportunidades reales de mejora y generación de valor." 
-        },
-        { 
-          title: "2. Diagnóstico basado en datos:", 
-          text: "Utilizamos analítica avanzada e inteligencia artificial para evaluar procesos, identificar riesgos y descubrir oportunidades de optimización." 
-        },
-        { 
-          title: "3. Diseño de soluciones a la medida:", 
-          text: "Estructuramos soluciones integrales alineadas con la estrategia del cliente, incorporando mejores prácticas de clase mundial." 
-        },
-        { 
-          title: "4. Implementación con impacto:", 
-          text: "Acompañamos la ejecución asegurando adopción, eficiencia operativa y resultados medibles." 
-        },
-        { 
-          title: "5. Seguimiento y mejora continua:", 
-          text: "Monitoreamos indicadores, ajustamos estrategias y garantizamos sostenibilidad en el tiempo." 
-        }
-      ]
-    },
-  ];
+      title: c.metodo_titulo,
+      carouselItems: c.pasos.map((paso, i) => ({ title: `${i + 1}. ${paso.titulo}:`, text: paso.descripcion })),
+    });
+  }
 
   return (
     <>      <section className="pt-28 md:pt-32 lg:pt-36 pb-20 gradient-primary text-white">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="max-w-4xl mx-auto text-center animate-fade-in">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">¿Transformamos su negocio?</h1>
-            <p className="text-lg md:text-xl text-white/90 leading-relaxed">
-              Combinamos experiencia sectorial, analítica avanzada e inteligencia artificial para diseñar e implementar soluciones a la medida que optimizan el desempeño, fortalecen la competitividad y generan resultados tangibles y sostenibles.
-            </p>
+            {c.encabezado_titulo && (
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">{c.encabezado_titulo}</h1>
+            )}
+            {c.encabezado_descripcion && (
+              <p className="text-lg md:text-xl text-white/90 leading-relaxed whitespace-pre-line">
+                {c.encabezado_descripcion}
+              </p>
+            )}
           </div>
         </div>
       </section>
@@ -173,9 +154,11 @@ const QuienesSomos = () => {
                     <Icon className="text-primary-foreground" size={32} />
                   </div>
 
-                  <h3 className="text-2xl font-semibold mb-4 group-hover:text-primary transition-colors shrink-0">
-                    {value.title}
-                  </h3>
+                  {value.title && (
+                    <h3 className="text-2xl font-semibold mb-4 group-hover:text-primary transition-colors shrink-0">
+                      {value.title}
+                    </h3>
+                  )}
 
                   {/* AÑADIDO: min-w-0 obliga a que los hijos Flexbox respeten el ancho y envuelvan el texto */}
                   <div className="flex-grow flex flex-col w-full min-w-0">
