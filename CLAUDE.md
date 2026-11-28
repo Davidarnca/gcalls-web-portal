@@ -70,18 +70,19 @@ src/
   lib/api/admin-servicios.ts   # Cliente de /api/admin/servicios.php
   lib/api/*.mock.ts            # Mocks DEV (import dinámico)
   contexts/AuthContext.tsx     # Sesión real contra /api/auth/*; usuario y csrfToken en memoria
-  components/admin/            # AdminLayout, AdminSidebar, AdminNavbar, ProtectedRoute, ContenidosTabs, SelectorIcono, CampoImagen
+  components/admin/            # AdminLayout, AdminSidebar, AdminNavbar, ProtectedRoute, ContenidosTabs, SelectorIcono, CampoImagen,
+                               # PiezasEditor + useEditorContenido (base de los editores nuevos de secciones del CMS)
   components/Mantenimiento.tsx # Pantalla de mantenimiento
   pages/                       # Páginas públicas
   pages/ServicioDetalle.tsx    # Plantilla única de /servicios/:slug (inactivo o inexistente → 404)
-  pages/admin/                 # Login, Dashboard, Contactos (leads), Contenidos, ContenidoInicio, ContenidoEquipo, ContenidoIdentidad, Servicios, ServicioEditar
+  pages/admin/                 # Login, Dashboard, Contactos (leads), Contenidos, ContenidoInicio, ContenidoEquipo, ContenidoQuienesSomos, ContenidoDecalogo, ContenidoIdentidad, Servicios, ServicioEditar
 public/api/
   config/env.php               # Carga .env
   config/db.php                # get_db_connection() singleton
   config/helpers.php           # json_response(), get_json_input() — mantener pequeño
   config/auth.php              # start_secure_session, check_auth, require_auth, validate_csrf_token, destroy_session
   config/cors.php              # Lista blanca de orígenes + X-CSRF-Token
-  config/contenidos.php        # CMS: esquema de secciones (global, inicio, identidad, equipo), validar_contenido()
+  config/contenidos.php        # CMS: esquema de secciones (global, inicio, identidad, equipo, quienes_somos, decalogo), validar_contenido()
   config/servicios.php         # Íconos y temas permitidos, validar_servicio_patch(), servicio_desde_fila()
   config/medios.php            # Usos de imagen, validación, regeneración con GD, medio_ruta(), medio_enviar()
   auth/{login,logout,me}.php
@@ -126,6 +127,12 @@ eliminaron con sus fotos): sin personas, la cuadrícula se oculta y la página q
 y llamada final. Foto con uso `retrato` (800 × 800, recortada, en círculo); sin foto, iniciales. LinkedIn y correo
 solo se muestran si se cargan. "Restaurar textos originales" conserva las personas.
 
+**Quiénes Somos** (sección `quienes_somos`) **y Decálogo** (`decalogo`): misión, visión y "cómo generamos valor" son
+textos; los pasos del método (1 a 8) y los principios (1 a 12) son listas que el sitio **numera solo** (el título no
+lleva número). Texto vacío = esa tarjeta o bloque no se muestra. En Decálogo el botón "Ver todos" solo aparece con más
+de 4 principios. Estos dos editores usan `useEditorContenido` y `PiezasEditor` (los de Inicio, Equipo y Contacto
+siguen con su propio código).
+
 **Layout del panel:** `AdminLayout` usa `h-screen` y el `<main relative overflow-y-auto>` es el que hace scroll.
 No volver a `min-h-screen`: la barra de guardado `sticky bottom-0` dejaría de quedar fija y el clic en
 "Guardar" se pierde cuando aparece un error al salir del campo.
@@ -145,7 +152,7 @@ queda idéntico). Favicon y vista previa al compartir salen de `/api/marca.php` 
 ## Comandos de verificación
 
 ```powershell
-npx tsc --noEmit          # debe salir con código 0
+npx tsc --noEmit -p tsconfig.app.json   # debe salir con código 0 (sin -p no revisa nada: tsconfig.json tiene files: [])
 npm run build             # build a dist/
 npx eslint .              # 0 errores (8 advertencias preexistentes de shadcn)
 php -l <archivo.php>      # cada PHP creado o modificado
@@ -208,7 +215,7 @@ Pruebas HTTP con `curl.exe` (no el alias `curl` de PowerShell) contra `http://lo
 |---|---|---|
 | H0 Línea base | Auth real, CSRF, sesiones, CORS, codificación, retiro de legado (PR #1, `47bb001`, 22/11) | ✅ Cerrado |
 | H1a CMS esencial | PR #2 contenidos globales (contacto, horario, redes, WhatsApp) · PR #3 servicios (plantilla única, edición, publicar/ocultar, selector en formulario) · PR #4 Inicio (banner y tarjetas) · PR #6 imágenes (identidad, banner, servicios) | ✅ Cerrado (#2–#6 fusionados, 22–23/11) |
-| H1b CMS resto | PR #7 Nuestro Equipo · Quiénes Somos, Decálogo, Mercados, Qué Gestionamos | En revisión: PR #7 |
+| H1b CMS resto | PR #7 Nuestro Equipo (fusionado) · Quiénes Somos + Decálogo (en revisión) · Mercados, Qué Gestionamos | En curso |
 | H2 CRM de leads | CRUD, estados, responsables, notas, próximas acciones, historial, borrado solo admin | Pendiente |
 | H3 Cotizaciones/PDF | Cotizaciones ligadas a leads, conceptos, cálculos, estados, PDF corporativo | Pendiente |
 | H4 Calidad y producción | ~~PHP 8.3 en el hosting~~ (hecho 23/11) · BD y `.env` en el hosting, SMTP PHP, rate limiting, antispam, `.htaccess` SPA, backups, retiro de mantenimiento, manuales | Pendiente |
@@ -224,7 +231,7 @@ Pendientes menores detectados:
 - Barra lateral del panel oculta en móvil (`hidden md:flex`): sin navegación en pantallas pequeñas.
 - Etiqueta "PRÓXIMAMENTE" desbordada en la barra lateral; Dashboard con un segundo botón "Cerrar sesión".
 - Footer: formulario de newsletter sin funcionalidad.
-- Tarjetas de servicios en "¿Qué Gestionamos?" siguen fijas en el código (H1b).
+- Mercados y "¿Qué Gestionamos?" siguen fijos en el código (H1b). Pendiente de confirmar con el cliente: metodología de 5 pasos (Quiénes Somos) vs 4 (Qué Gestionamos) y el décimo principio del Decálogo.
 - Inicio: la sección "Nuestros Aliados" (empresas, cifras y testimonios) se retiró por no ser real (PR #4).
   Volverá como sección editable cuando el cliente entregue datos reales y autorización de uso de logos y testimonios.
 - Imágenes subidas que dejan de usarse no se borran (falta limpieza; sin impacto práctico por ahora).

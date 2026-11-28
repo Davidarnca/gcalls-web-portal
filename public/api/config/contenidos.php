@@ -91,6 +91,40 @@ function contenidos_schema(): array
             'cta_descripcion' => ['tipo' => 'multilinea', 'max' => 300, 'etiqueta' => 'Descripción de la llamada final'],
             'cta_boton'       => ['tipo' => 'texto',      'max' => 40,  'etiqueta' => 'Botón de la llamada final'],
         ],
+        'quienes_somos' => [
+            'encabezado_titulo'      => ['tipo' => 'texto',      'max' => 80,  'etiqueta' => 'Título del encabezado'],
+            'encabezado_descripcion' => ['tipo' => 'multilinea', 'max' => 600, 'etiqueta' => 'Descripción del encabezado'],
+            'mision_titulo'          => ['tipo' => 'texto',      'max' => 60,  'etiqueta' => 'Título de la misión'],
+            'mision'                 => ['tipo' => 'multilinea', 'max' => 800, 'etiqueta' => 'Misión'],
+            'vision_titulo'          => ['tipo' => 'texto',      'max' => 60,  'etiqueta' => 'Título de la visión'],
+            'vision'                 => ['tipo' => 'multilinea', 'max' => 800, 'etiqueta' => 'Visión'],
+            'valor_titulo'           => ['tipo' => 'texto',      'max' => 60,  'etiqueta' => 'Título de cómo generamos valor'],
+            'valor'                  => ['tipo' => 'multilinea', 'max' => 800, 'etiqueta' => 'Cómo generamos valor', 'max_lineas' => 10],
+            'metodo_titulo'          => ['tipo' => 'texto',      'max' => 60,  'etiqueta' => 'Título de cómo lo hacemos'],
+            // Pasos numerados automáticamente en el sitio (1., 2., 3.…)
+            'pasos' => [
+                'tipo' => 'lista', 'min' => 1, 'max' => 8, 'etiqueta' => 'Paso',
+                'campos' => [
+                    'titulo'      => ['tipo' => 'texto',      'max' => 100, 'etiqueta' => 'Título', 'requerido' => true],
+                    'descripcion' => ['tipo' => 'multilinea', 'max' => 400, 'etiqueta' => 'Descripción'],
+                ],
+            ],
+        ],
+        'decalogo' => [
+            'encabezado_titulo'      => ['tipo' => 'texto',      'max' => 80,  'etiqueta' => 'Título del encabezado'],
+            'encabezado_destacado'   => ['tipo' => 'texto',      'max' => 60,  'etiqueta' => 'Título destacado del encabezado'],
+            'encabezado_descripcion' => ['tipo' => 'multilinea', 'max' => 400, 'etiqueta' => 'Descripción del encabezado'],
+            'principios' => [
+                'tipo' => 'lista', 'min' => 1, 'max' => 12, 'etiqueta' => 'Principio',
+                'campos' => [
+                    'titulo'      => ['tipo' => 'texto',      'max' => 80,  'etiqueta' => 'Título', 'requerido' => true],
+                    'descripcion' => ['tipo' => 'multilinea', 'max' => 250, 'etiqueta' => 'Descripción'],
+                ],
+            ],
+            'boton_ver_todos'  => ['tipo' => 'texto',      'max' => 40,  'etiqueta' => 'Botón «Ver todos»'],
+            'propuesta_titulo' => ['tipo' => 'texto',      'max' => 80,  'etiqueta' => 'Título de la propuesta de valor'],
+            'propuesta_texto'  => ['tipo' => 'multilinea', 'max' => 800, 'etiqueta' => 'Texto de la propuesta de valor'],
+        ],
         'inicio' => [
             'hero_imagen'              => ['tipo' => 'imagen',     'uso' => 'foto', 'max' => 80, 'etiqueta' => 'Foto de fondo del banner'],
             'hero_antetitulo'          => ['tipo' => 'texto',      'max' => 60,  'etiqueta' => 'Antetítulo del banner'],

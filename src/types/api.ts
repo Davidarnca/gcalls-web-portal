@@ -90,7 +90,7 @@ export type LogoutResponse = ApiResponse<never>;
 // Campos definidos en public/api/config/contenidos.php. Todos son texto; vacío = no mostrar
 // (en las imágenes, vacío = imagen por defecto).
 
-export type ContenidoSeccion = 'global' | 'inicio' | 'identidad' | 'equipo';
+export type ContenidoSeccion = 'global' | 'inicio' | 'identidad' | 'equipo' | 'quienes_somos' | 'decalogo';
 
 /** Usos de imagen aceptados por /api/admin/medios.php (definen tamaño y formato) */
 export type UsoImagen = 'logo' | 'favicon' | 'compartir' | 'foto' | 'retrato';
@@ -195,6 +195,43 @@ export interface ContenidoEquipo {
   cta_titulo: string;
   cta_descripcion: string;
   cta_boton: string;
+}
+
+export interface PasoMetodo {
+  titulo: string;
+  descripcion: string;
+}
+
+/** Sección `quienes_somos`: misión, visión y método. Texto vacío = esa tarjeta no se muestra. */
+export interface ContenidoQuienesSomos {
+  encabezado_titulo: string;
+  encabezado_descripcion: string;
+  mision_titulo: string;
+  mision: string;
+  vision_titulo: string;
+  vision: string;
+  valor_titulo: string;
+  /** Una línea por renglón; el sitio las muestra tal cual (con «• » si se escribe) */
+  valor: string;
+  metodo_titulo: string;
+  /** El sitio numera los pasos automáticamente */
+  pasos: PasoMetodo[];
+}
+
+export interface PrincipioDecalogo {
+  titulo: string;
+  descripcion: string;
+}
+
+/** Sección `decalogo`: principios numerados y propuesta de valor */
+export interface ContenidoDecalogo {
+  encabezado_titulo: string;
+  encabezado_destacado: string;
+  encabezado_descripcion: string;
+  principios: PrincipioDecalogo[];
+  boton_ver_todos: string;
+  propuesta_titulo: string;
+  propuesta_texto: string;
 }
 
 /** GET /api/contenidos.php — `datos` puede venir parcial o vacío si nunca se guardó */

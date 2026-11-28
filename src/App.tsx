@@ -27,6 +27,8 @@ import AdminContenidos from "./pages/admin/Contenidos";
 import AdminContenidoInicio from "./pages/admin/ContenidoInicio";
 import AdminContenidoIdentidad from "./pages/admin/ContenidoIdentidad";
 import AdminContenidoEquipo from "./pages/admin/ContenidoEquipo";
+import AdminContenidoQuienesSomos from "./pages/admin/ContenidoQuienesSomos";
+import AdminContenidoDecalogo from "./pages/admin/ContenidoDecalogo";
 import AdminServicios from "./pages/admin/Servicios";
 import AdminServicioEditar from "./pages/admin/ServicioEditar";
 import ServicioDetalle from "./pages/ServicioDetalle";
@@ -63,6 +65,8 @@ const App = () => {
                   <Route path="contenidos" element={<AdminContenidos />} />
                   <Route path="contenidos/inicio" element={<AdminContenidoInicio />} />
                   <Route path="contenidos/identidad" element={<AdminContenidoIdentidad />} />
+                  <Route path="contenidos/quienes-somos" element={<AdminContenidoQuienesSomos />} />
+                  <Route path="contenidos/decalogo" element={<AdminContenidoDecalogo />} />
                   <Route path="contenidos/equipo" element={<AdminContenidoEquipo />} />
                   <Route path="servicios" element={<AdminServicios />} />
                   <Route path="servicios/:id" element={<AdminServicioEditar />} />
